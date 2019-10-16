@@ -196,17 +196,15 @@
     
     .three {
         position: fixed;
-        width: 300px;
-        margin: 0px auto;
+        width: 220px;
         left: 0;
         right: 0;
         bottom: 34px;
-        margin: 0 auto;
-        height: 48px;
-        line-height: 48px;
+        height: 44px;
+        line-height: 44px;
         background: #31AEFF;
         border-radius: 200px;
-        border-radius: 4px;
+        margin: 0 auto;
         z-index: 999;
     }
     
@@ -252,12 +250,12 @@
                 <span @click="add"><img src="./images/subtract.png"></span>
             </div>
             <div style="margin:10px 0px;text-align: center">
-                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']"></date-picker>
-                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']"></date-picker>
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
             </div>
             <div style="margin:10px 0px;text-align: center">
-                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']"></date-picker>
-                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']"></date-picker>
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
             </div>
         </div>
         <div style="height:50px;"></div>
@@ -449,7 +447,7 @@
                 if (baseUrl === "file://") {
                     baseUrl = 'http://dev1.elapps.net';
                 }
-                this.schemeConfig['ReturnUrl'] = baseUrl + '/previewVote.html';
+                this.schemeConfig['ReturnUrl'] = baseUrl + '/createResult.html';
                 var url = "elaphant://sign?";
                 _.forEach(this.schemeConfig, function(val, key, index) {
                     if (key === 'ReturnUrl' || key === 'RequestInfo' || key === 'RequestedContent') {

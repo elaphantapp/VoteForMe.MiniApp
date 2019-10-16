@@ -315,17 +315,15 @@
     
     .three {
         position: fixed;
-        width: 300px;
-        margin: 0px auto;
+        width: 220px;
         left: 0;
         right: 0;
         bottom: 34px;
-        margin: 0 auto;
-        height: 48px;
-        line-height: 48px;
+        height: 44px;
+        line-height: 44px;
         background: #31AEFF;
         border-radius: 200px;
-        border-radius: 4px;
+        margin: 0 auto;
         z-index: 999;
     }
     
@@ -342,44 +340,36 @@
         margin: 0px auto;
         left: 0;
         right: 0;
-        bottom: 94px;
-        margin: 0 auto;
-        height: 48px;
-        line-height: 48px;
-        background: #31AEFF;
-        border-radius: 200px;
-        border-radius: 4px;
+        bottom: 34px;
         z-index: 999;
     }
     
-    .four p {
+    .four .left {
+        display: inline-block;
+        width: 130px;
+        margin-right: 15px;
         font-family: Bio Sans;
         font-size: 16px;
         text-align: center;
         color: #ffffff;
-    }
-    
-    .five {
-        position: fixed;
-        width: 300px;
-        margin: 0px auto;
-        left: 0;
-        right: 0;
-        bottom: 34px;
-        margin: 0 auto;
         height: 48px;
         line-height: 48px;
-        /* background: #31AEFF; */
-        border: 1px solid #31AEFF;
-        border-radius: 4px;
-        z-index: 999;
+        background: #31AEFF;
+        border-radius: 200px;
     }
     
-    .five p {
+    .four .right {
+        display: inline-block;
+        width: 130px;
+        margin-left: 15px;
         font-family: Bio Sans;
         font-size: 16px;
         text-align: center;
-        color: #31AEFF;
+        color: #ffffff;
+        height: 48px;
+        line-height: 48px;
+        background: #31AEFF;
+        border-radius: 200px;
     }
     
     .footer {
@@ -438,8 +428,8 @@
         </div>
         <div class="second">
             <img src="./images/lingdang.png" />
-            <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -45px;margin-left: 41px;">{{dateFormat(new Date(chainObj['Starting-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}({{curLangule['key15']}}：{{parseInt(chainObj['Starting-height'])}})</div>
-            <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -23px;margin-left: 41px;"> {{dateFormat(new Date(chainObj['End-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}({{curLangule['key15']}}：{{parseInt(chainObj['End-height'])}})</div>
+            <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -45px;margin-left: 41px;">{{dateFormat(new Date(chainObj['Starting-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}（ {{curLangule['key15']}}：{{parseInt(chainObj['Starting-height'])}} ）</div>
+            <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -23px;margin-left: 41px;"> {{dateFormat(new Date(chainObj['End-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}（ {{curLangule['key15']}}：{{parseInt(chainObj['End-height'])}} ）</div>
         </div>
         <div style="height:260px"></div>
         <div class="list">
@@ -477,14 +467,15 @@
                 </div>
             </div>
         </div>
-        <div style="height:140px" v-if="showType===0"></div>
-        <div style="height:90px" v-else></div>
+        <div style="height:90px"></div>
         <div class="four" v-if="showType===0">
-            <p @click="shanglian">{{curLangule['key']}}</p>
-        </div>
+            <span @click="share" class="left">
+                {{curLangule['key12']}}
+            </span>
 
-        <div class="five" v-if="showType===0">
-            <p @click="share">{{curLangule['key12']}}</p>
+            <span @click="shanglian" class="right">
+                {{curLangule['key']}}
+            </span>
         </div>
 
         <div class="three" v-if="showType===1">
