@@ -1,0 +1,892 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="./js/vue.min.js"></script>
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/lodash.min.js"></script>
+    <script src="./js/minirefresh.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/reset.css">
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+</head>
+<style type="text/css">
+    body {
+        background: #ffffff;
+    }
+    
+    .xiaoshuo {
+        cursor: pointer;
+    }
+    
+    .list {
+        position: relative;
+        padding: 10px;
+    }
+    
+    .list .hang {
+        height: 85px;
+        margin-bottom: 10px;
+        background: rgba(208, 214, 255, 0.2);
+        border-radius: 5px;
+    }
+    
+    .list .hang .top {
+        margin: 0px 15px;
+        height: 42px;
+        line-height: 42px;
+        border-bottom: 1px solid #D8DAE1;
+    }
+    
+    .list .hang .top1 {
+        margin: 0px 15px;
+        height: 42px;
+        /* line-height: 42px; */
+        border-bottom: 1px solid #D8DAE1;
+    }
+    
+    .list .hang .top span {
+        font-family: Bio Sans;
+        font-size: 14px;
+        color: #222222;
+    }
+    
+    .list .hang .bottom {
+        margin: 0px 15px;
+        height: 42px;
+    }
+    
+    .list .hang .bottom .hang1 {
+        position: relative;
+    }
+    
+    .list .hang .bottom .hang1 .type {
+        position: absolute;
+        top: 15px;
+        left: 0px;
+        font-family: Bio Sans;
+        font-size: 12px;
+        color: #00A9FE;
+    }
+    
+    .list .hang .bottom .hang1 .startData {
+        position: absolute;
+        top: 8px;
+        right: 0px;
+        font-family: Bio Sans;
+        font-size: 12px;
+        color: #888888;
+    }
+    
+    .list .hang .bottom .hang1 .endData {
+        position: absolute;
+        top: 22px;
+        right: 0px;
+        font-size: 12px;
+        font-family: Bio Sans;
+        color: #888888;
+    }
+    
+    .tab {
+        height: 40px;
+        line-height: 40px;
+        border-bottom: 1px solid #EBEBEB;
+    }
+    
+    .tab .left {
+        float: left;
+        text-align: center;
+        width: 50%;
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #1F1F1F;
+    }
+    
+    .tab .left span {
+        display: inline-block;
+        text-align: center;
+        height: 40px;
+        width: 80px;
+    }
+    
+    .tab .bule {
+        border-bottom: 1px solid #00A9FE;
+    }
+    
+    .tab .right {
+        float: left;
+        text-align: center;
+        width: 50%;
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #1F1F1F;
+    }
+    
+    .tab .right span {
+        display: inline-block;
+        text-align: center;
+        height: 40px;
+        width: 80px;
+    }
+    
+    .minirefresh-wrap {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        overflow-x: hidden;
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        z-index: 1
+    }
+    
+    .minirefresh-scroll {
+        position: relative;
+        background: #ffffff;
+    }
+    
+    .body-scroll-wrap {
+        position: relative
+    }
+    
+    .minirefresh-hardware-speedup {
+        -webkit-transform: translateZ(0);
+        -moz-transform: translateZ(0);
+        transform: translateZ(0)
+    }
+    
+    .minirefresh-hidden {
+        display: none!important
+    }
+    
+    .minirefresh-wrap::-webkit-scrollbar-track {
+        background-color: transparent
+    }
+    
+    .minirefresh-wrap::-webkit-scrollbar {
+        width: 6px
+    }
+    
+    .minirefresh-hide-scrollbar::-webkit-scrollbar {
+        width: 0
+    }
+    
+    .minirefresh-wrap::-webkit-scrollbar-thumb {
+        border-radius: 6px;
+        background-color: #ccc
+    }
+    
+    .minirefresh-wrap::-webkit-scrollbar-thumb:hover {
+        background-color: #aaa
+    }
+    
+    .minirefresh-rotate {
+        -webkit-animation: minirefresh-rotate .6s linear infinite;
+        animation: minirefresh-rotate .6s linear infinite
+    }
+    
+    .minirefresh-fade-in {
+        -webkit-animation: minirefresh-fade-in .5s linear forwards;
+        animation: minirefresh-fade-in .5s linear forwards
+    }
+    
+    .minirefresh-fade-out {
+        pointer-events: none;
+        -webkit-animation: minirefresh-fade-out .5s linear forwards;
+        animation: minirefresh-fade-out .5s linear forwards
+    }
+    
+    .minirefresh-totop {
+        position: fixed;
+        z-index: 9990;
+        right: 10px;
+        bottom: 30px;
+        width: 36px;
+        height: 36px;
+        border-radius: 50%;
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADAAAAAwCAMAAABg3Am1AAAAclBMVEUAAAAAAAAAAAAAAADp6ekAAAAAAAAAAADOzs4AAAAAAAAAAAAAAAAAAAAAAAAAAADo6OjW1tYeHh7l5eXh4eHY2NjAwMC5ubm3t7cxMTH7+/vv7+/s7Ozc3NzNzc2tra0TExPp6enS0tLQ0NDDw8P///9ezvBLAAAAJXRSTlNNAAod1T46NbASSEc0Kykk07pTzsm9o52ZWfXg2sGvk1HUtbOmfFE0sAAAAT1JREFUSMeV1t1ygjAQhuGvu4ZU+VUUqVrtX+7/FpuCTJEsmH2POMgzMEzYgBdlISAurEmB1NiC6RkgzjYYtcmYFgCVBkGmpDnACcQSFgHlmC2nEKwtFrLrKVgnWCwZBKT1shgDsniapRHIEVH+DxhR8QAoiQMJ3UGJyMoekIkFhjrAiI47kGHU2U06Y1T2B+hhP7evfdfr/aJ92O3kAUMRe1BA6K3e7yBUeGCl9ZVz7x8Isx4Ycf3pJArjQYppu9rd6qpxhxCkHoTr9+6Gzwo/bhsKD4T1LbBaAUdBCI90cEf0wIsv4ZHMFDQYAJrpLYz8Wgcgv9ZCAwoPWAO423zxYEPd9o4HWf8BxQPuAJlYYGh+CFwuCCsXxsz2Wxoz2kGmHZXqYawe9/oDRX9k6Q9F/bGrP9j1vw76nxNlv9R2ECcaFzswAAAAAElFTkSuQmCC');
+        background-size: 100% 100%
+    }
+    
+    @-moz-keyframes minirefresh-fade-in {
+        0% {
+            opacity: 0
+        }
+        100% {
+            opacity: 1
+        }
+    }
+    
+    @-webkit-keyframes minirefresh-fade-in {
+        0% {
+            opacity: 0
+        }
+        100% {
+            opacity: 1
+        }
+    }
+    
+    @-o-keyframes minirefresh-fade-in {
+        0% {
+            opacity: 0
+        }
+        100% {
+            opacity: 1
+        }
+    }
+    
+    @keyframes minirefresh-fade-in {
+        0% {
+            opacity: 0
+        }
+        100% {
+            opacity: 1
+        }
+    }
+    
+    @-moz-keyframes minirefresh-fade-out {
+        0% {
+            opacity: 1
+        }
+        100% {
+            opacity: 0
+        }
+    }
+    
+    @-webkit-keyframes minirefresh-fade-out {
+        0% {
+            opacity: 1
+        }
+        100% {
+            opacity: 0
+        }
+    }
+    
+    @-o-keyframes minirefresh-fade-out {
+        0% {
+            opacity: 1
+        }
+        100% {
+            opacity: 0
+        }
+    }
+    
+    @keyframes minirefresh-fade-out {
+        0% {
+            opacity: 1
+        }
+        100% {
+            opacity: 0
+        }
+    }
+    
+    @-moz-keyframes minirefresh-rotate {
+        0% {
+            -webkit-transform: rotateZ(0);
+            transform: rotateZ(0);
+            -moz-transform: rotate(0)
+        }
+        100% {
+            -webkit-transform: rotateZ(360deg);
+            transform: rotateZ(360deg);
+            -moz-transform: rotate(360deg)
+        }
+    }
+    
+    @-webkit-keyframes minirefresh-rotate {
+        0% {
+            -webkit-transform: rotateZ(0);
+            transform: rotateZ(0);
+            -moz-transform: rotate(0)
+        }
+        100% {
+            -webkit-transform: rotateZ(360deg);
+            transform: rotateZ(360deg);
+            -moz-transform: rotate(360deg)
+        }
+    }
+    
+    @-o-keyframes minirefresh-rotate {
+        0% {
+            -webkit-transform: rotateZ(0);
+            transform: rotateZ(0);
+            -moz-transform: rotate(0)
+        }
+        100% {
+            -webkit-transform: rotateZ(360deg);
+            transform: rotateZ(360deg);
+            -moz-transform: rotate(360deg)
+        }
+    }
+    
+    @keyframes minirefresh-rotate {
+        0% {
+            -webkit-transform: rotateZ(0);
+            transform: rotateZ(0);
+            -moz-transform: rotate(0)
+        }
+        100% {
+            -webkit-transform: rotateZ(360deg);
+            transform: rotateZ(360deg);
+            -moz-transform: rotate(360deg)
+        }
+    }
+    
+    .minirefresh-theme-default .minirefresh-downwrap {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 75px
+    }
+    
+    .minirefresh-theme-default .minirefresh-upwrap {
+        min-height: 30px;
+        padding: 15px 0;
+        text-align: center;
+        background-color: #e5e5e5;
+    }
+    
+    .minirefresh-theme-default .downwrap-content {
+        width: 100%;
+        padding: 10px 0;
+        text-align: center
+    }
+    
+    .minirefresh-theme-default .minirefresh-downwrap .downwrap-progress,
+    .minirefresh-theme-default .minirefresh-upwrap .upwrap-progress {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        border-radius: 50%;
+        border: 1px solid grey;
+        margin-right: 8px;
+        border-bottom-color: transparent;
+        vertical-align: middle
+    }
+    
+    .minirefresh-theme-default .minirefresh-downwrap .downwrap-error,
+    .minirefresh-theme-default .minirefresh-downwrap .downwrap-success {
+        display: none
+    }
+    
+    .minirefresh-theme-default .minirefresh-downwrap .downwrap-tips,
+    .minirefresh-theme-default .minirefresh-upwrap .upwrap-tips {
+        display: inline-block;
+        font-size: 12px;
+        color: grey;
+        vertical-align: middle
+    }
+    
+    .minirefresh-theme-default .status-nomore .upwrap-tips {
+        padding: 15px 0
+    }
+    
+    ** * showcase通用样式 */ * {
+        -webkit-user-select: none;
+    }
+    /*
+ * 需要定制位置
+ */
+    
+    .minirefresh-wrap {
+        top: 40px;
+    }
+    
+    .data-list {
+        position: relative;
+        margin-top: 0;
+        margin-bottom: 0;
+        padding-left: 0;
+        list-style: none;
+        background-color: #ffffff;
+    }
+    
+    .list-item {
+        position: relative;
+        overflow: hidden;
+        padding: 11px 15px;
+        -webkit-touch-callout: none;
+    }
+    
+    .list-item:after {
+        position: absolute;
+        right: 0;
+        bottom: 0;
+        left: 15px;
+        height: 1px;
+        content: '';
+        -webkit-transform: scaleY(.5);
+        transform: scaleY(.5);
+        background-color: #c8c7cc;
+    }
+    
+    .list-item:active {
+        background: #F5F5F5;
+    }
+    
+    .msg-title {
+        display: block;
+        font-size: 15px;
+        margin: 5px;
+    }
+    
+    .msg-fs14 {
+        font-size: 14px;
+        color: #999;
+    }
+    
+    .msg-date {
+        float: right;
+        margin: 5px;
+    }
+    
+    .list-item a,
+    .navbar-header a {
+        text-decoration: none;
+        color: #18B4FE;
+    }
+    
+    .nav-tips {
+        font-size: 14px;
+        padding: 12px;
+        border-bottom: 1px solid #c8c7cc;
+        color: red;
+    }
+    
+    .navbar-header {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 44px;
+        line-height: 44px;
+        text-align: center;
+        border-bottom: 1px solid #c8c7cc;
+        background-color: #FFFFFF;
+        z-index: 999;
+    }
+    
+    .nav-control {
+        position: fixed;
+        top: 45px;
+        left: 0;
+        width: 100%;
+        height: 44px;
+        line-height: 17px;
+        border-bottom: 1px solid #ddd;
+        text-align: center;
+        /**
+     * 防止点击时闪动
+     */
+        -webkit-tap-highlight-color: transparent;
+    }
+    
+    .nav-control .active {
+        border-bottom: 1px solid #FF6990;
+        color: #FF6990;
+    }
+    
+    .nav-control p {
+        display: inline-block;
+        width: 32%;
+        padding: 5px 0;
+    }
+    
+    .nav-btn-left {
+        position: absolute;
+        top: 0;
+        left: 0;
+        padding: 12px;
+        line-height: 22px;
+    }
+    
+    .huanhang {
+        white-space: pre-wrap;
+        white-space: -moz-pre-wrap;
+        white-space: -pre-wrap;
+        white-space: -o-pre-wrap;
+        word-wrap: break-word;
+    }
+    
+    .three {
+        position: fixed;
+        width: 300px;
+        margin: 0px auto;
+        left: 0;
+        right: 0;
+        bottom: 34px;
+        margin: 0 auto;
+        height: 48px;
+        line-height: 48px;
+        background: #31AEFF;
+        border-radius: 200px;
+        border-radius: 4px;
+        z-index: 999;
+    }
+    
+    .three p {
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #ffffff;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        bottom: 10px;
+        height: 20px;
+        line-height: 20px;
+        background-color: #fff;
+        text-align: center;
+        color: #31AEFF;
+        margin: 0 auto;
+        z-index: 999;
+    }
+    
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="app" v-cloak>
+
+        <div class="tab">
+            <div class="left" @click="clickTab(0)">
+                <span :class="{bule:tabIndex===0}">{{curLangule['key4']}}</span>
+            </div>
+            <div class="right" @click="clickTab(1)">
+                <span :class="{bule:tabIndex===1}">{{curLangule['key5']}}</span>
+            </div>
+        </div>
+
+        <div id="minirefresh" class="minirefresh-wrap">
+            <div class="minirefresh-scroll">
+                <div class="data-list">
+                    <div class="list" v-if="tabIndex===0">
+                        <div style="margin-top: 20px;text-align:center;padding:0px 10px" v-if="!loading&&didVoteArr.length===0">暂无发送的交易</div>
+                        <div class="hang" v-for="(item,index) in didVoteArr" @click="clickItem(item)">
+                            <div class="top">
+                                <span>{{item["RequestedConent"]["Name"]}}</span>
+                            </div>
+                            <div class="bottom">
+                                <div class="hang1">
+                                    <span class="type" v-if="item['RequestedConent']['Type']==='singleChoice'">[{{curLangule['key']}}]</span>
+                                    <span class="type" v-if="item['RequestedConent']['Type']==='multipleChoice'">[{{curLangule['key1']}}]</span>
+                                    <span class="startData" v-if='item["RequestedConent"]["Starting-height-alias"]'>{{curLangule['key2']}}:  {{dateFormat(new Date(item["RequestedConent"]['Starting-height-alias'] * 1000), ' yyyy-MM-dd HH:mm')}}</span>
+                                    <span class="endData" v-if='item["RequestedConent"]["End-height-alias"]'>{{curLangule['key3']}}: {{dateFormat(new Date(item["RequestedConent"]['End-height-alias'] * 1000), ' yyyy-MM-dd HH:mm')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding-bottom:70px">&nbsp;</div>
+                    </div>
+
+
+                    <div class="list" v-if="tabIndex===1">
+                        <div style="margin-top: 20px;text-align:center;padding:0px 10px" v-if="!loading&&Object.keys(didList).length===0">{{curLangule['key8']}}</div>
+                        <div class="hang" v-for="(item,index) in didList" @click="clickItem(item)">
+                            <div class="top1">
+                                <span class="huanhang">{{item["txHash"]}}</span>
+                            </div>
+                            <div class="bottom">
+                                <div class="hang1">
+                                    <span class="startData">{{curLangule['key6']}}:  {{dateFormat(new Date(item["createTime"] * 1000), ' yyyy-MM-dd HH:mm')}}</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div style="padding-bottom:70px">&nbsp;</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="three" @click="tiaozhuan" v-if="tabIndex===0">
+            <p>
+                {{curLangule["key7"]}}</p>
+            </p>
+        </div>
+
+        <div class="footer" v-if="this.curTime!=''">
+            {{dateFormat(new Date(this.curTime), 'yyyy-MM-dd HH:mm')}}（{{curLangule['key9']}}：{{curblock}}）
+        </div>
+    </div>
+
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            zh: {
+                title: '投票',
+                key: '单选',
+                key1: '多选',
+                key2: '开始日期',
+                key3: '结束日期',
+                key4: '投票列表',
+                key5: '投票中',
+                key6: '发送日期',
+                key7: '创建投票',
+                key8: '没有数据',
+                key9: '当前区块',
+                key30: '下拉刷新',
+                key31: '',
+                key32: '加载中...',
+                key33: '没有更多数据',
+                key34: '上拉显示更多',
+            },
+            en: {
+                title: 'Votings',
+                key: 'Single Choice',
+                key1: 'Multiple Choice',
+                key2: 'Start Date',
+                key3: 'End  Date',
+                key4: 'Vote List',
+                key5: 'Voting',
+                key6: 'Sent Date',
+                key7: 'Create a voting',
+                key8: 'No Data',
+                key9: 'Current Block',
+                key30: 'pull Refresh',
+                key31: '',
+                key32: 'loading...',
+                key33: 'No More Data',
+                key34: 'Pull-up Load More',
+            },
+            curLangule: {},
+            chainDid: "",
+            didVoteArr: [],
+            loading: true,
+            tabIndex: 0,
+            didList: {},
+            wholeData: {},
+            curblock: '',
+            curTime: ''
+        },
+        methods: {
+            getVoteDid() {
+                this.getAjax('http://54.178.212.109:8095/api/1/didvoting/did').then((res) => {
+                    var data = res.data;
+                    if (res['state'] === 200) {
+                        this.chainDid = data['did'];
+                        this.initTab();
+                    }
+                }).catch(() => {
+
+                });
+            },
+            tiaozhuan() {
+                location.href = './createType.html';
+            },
+            clickTab(index) {
+                this.tabIndex = index;
+                switch (this.tabIndex) {
+                    case 0:
+                        this.downCallback();
+                        break;
+                    case 1:
+                        this.handleDate1();
+                        break;
+                }
+
+            },
+            dateFormat(date, sFormat) {
+                let time = {
+                    Year: 0,
+                    TYear: '0',
+                    Month: 0,
+                    TMonth: '0',
+                    Day: 0,
+                    TDay: '0',
+                    Hour: 0,
+                    THour: '0',
+                    hour: 0,
+                    Thour: '0',
+                    Minute: 0,
+                    TMinute: '0',
+                    Second: 0,
+                    TSecond: '0',
+                    Millisecond: 0
+                };
+                time.Year = date.getFullYear();
+                time.TYear = String(time.Year).substr(2);
+                time.Month = date.getMonth() + 1;
+                time.TMonth = time.Month < 10 ? "0" + time.Month : String(time.Month);
+                time.Day = date.getDate();
+                time.TDay = time.Day < 10 ? "0" + time.Day : String(time.Day);
+                time.Hour = date.getHours();
+                time.THour = time.Hour < 10 ? "0" + time.Hour : String(time.Hour);
+                time.hour = time.Hour < 13 ? time.Hour : time.Hour - 12;
+                time.Thour = time.hour < 10 ? "0" + time.hour : String(time.hour);
+                time.Minute = date.getMinutes();
+                time.TMinute = time.Minute < 10 ? "0" + time.Minute : String(time.Minute);
+                time.Second = date.getSeconds();
+                time.TSecond = time.Second < 10 ? "0" + time.Second : String(time.Second);
+                time.Millisecond = date.getMilliseconds();
+
+                return sFormat.replace(/yyyy/ig, String(time.Year))
+                    .replace(/yyy/ig, String(time.Year))
+                    .replace(/yy/ig, time.TYear)
+                    .replace(/y/ig, time.TYear)
+                    .replace(/MM/g, time.TMonth)
+                    .replace(/M/g, String(time.Month))
+                    .replace(/dd/ig, time.TDay)
+                    .replace(/d/ig, String(time.Day))
+                    .replace(/HH/g, time.THour)
+                    .replace(/H/g, String(time.Hour))
+                    .replace(/hh/g, time.Thour)
+                    .replace(/h/g, String(time.hour))
+                    .replace(/mm/g, time.TMinute)
+                    .replace(/m/g, String(time.Minute))
+                    .replace(/ss/ig, time.TSecond)
+                    .replace(/s/ig, String(time.Second))
+                    .replace(/fff/ig, String(time.Millisecond))
+            },
+            clickItem(item) {
+                if (this.tabIndex === 0) {
+                    var hash = item["property_key"].split('/')[1];
+                    location.href = "./didVote.html?hashStr=" + hash;
+                } else {
+                    window.open('https://idchain.elastos.org/txinfo/' + item['txHash']);
+                }
+
+            },
+            handleDate(list) {
+                var arr = [];
+                for (var index = 0; index < list.length; index++) {
+                    var item = list[index];
+                    var key = item["property_key"];
+                    if (key.indexOf('topic_object') > -1) {
+                        var str = JSON.parse(item["property_value"])["DataStr"] || "";
+                        if (str != "") {
+                            var sitem = JSON.parse(decodeURIComponent(str));
+                            sitem["property_key"] = item["property_key"];
+                            sitem["txid"] = item["txid"];
+                            var requestedConent = sitem["RequestedConent"] || sitem["RequestedContent"];
+                            sitem["RequestedConent"] = JSON.parse(requestedConent);
+                            arr.push(sitem);
+                        }
+                    }
+                }
+                arr = _.sortBy(arr, function(item) {
+                    return -item["RequestedConent"]["End-height-alias"];
+                });
+                return arr;
+            },
+            handleDate1() {
+                var hashList = localStorage.getItem('did-vote-sendTx-hashList') || "";
+                if (hashList === "" || hashList === '{}') {
+                    this.didList = {};
+                } else {
+                    this.didList = JSON.parse(hashList);
+                }
+                var arr = Object.keys(this.didList);
+                for (var index = 0; index < arr.length; index++) {
+                    let txId = arr[index];
+                    let url = 'https://idchain.elastos.org/api/v1/block/transactions/txid?txid=' + txId;
+                    this.getAjax(url).then((res) => {
+                        if (res.length > 0) {
+                            Vue.delete(this.didList, txId);
+                            localStorage.setItem('did-vote-sendTx-hashList', JSON.stringify(this.didList));
+                        }
+                    });
+                }
+            },
+            getAjax(url) {
+                return new Promise((resovle, reject) => {
+                    $.ajax({
+                        url: url,
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function(data) { //成功回调函数
+                            resovle(data);
+                        },
+                        error: function(err) { //失败回调函数
+                            reject(err);
+                        }
+                    });
+                });
+            },
+            getLanugle: function() {
+                this.curLangule = this.en;
+                this.curLanguleKey = 'en';
+                var JsSrc = (navigator.language || navigator.browserLanguage).toLowerCase();
+                if (JsSrc.indexOf('zh') >= 0) {
+                    // 假如浏览器语言是中文
+                    this.curLanguleKey = 'zh';
+                    this.curLangule = this.zh;
+                } else if (JsSrc.indexOf('en') >= 0) {
+                    this.curLangule = this.en;
+                    this.curLanguleKey = 'en';
+                } else {
+                    // 假如浏览器语言是其它语言
+                    this.curLangule = this.en;
+                    this.curLanguleKey = 'en';
+                }
+            },
+            downCallback: function() {
+                var self = this;
+                this.loading = true;
+                var url = 'https://idchain.elastos.org/api/v1/block/properteis/did?did=' + this.chainDid;
+                if (this.tabIndex === 0) {
+                    this.getAjax(url).then((res) => {
+                        this.didVoteArr = this.handleDate(res);
+                        this.loading = false;
+                        this.miniRefresh.endDownLoading(false);
+                    }).catch((err) => {
+                        this.loading = false;
+                        this.miniRefresh.endDownLoading(false);
+                        console.log(JSON.stringify(err));
+                    });
+                } else {
+                    setTimeout(() => {
+                        this.handleDate1();
+                        this.loading = false;
+                        this.miniRefresh.endDownLoading(false);
+                    }, 500);
+
+                }
+            },
+            initTab() {
+                var self = this;
+                self.miniRefresh = new MiniRefresh({
+                    container: '#minirefresh',
+                    down: {
+                        // 默认没有锁定，可以通过API动态设置
+                        isLock: false,
+                        // 是否自动上拉加载-初始化是是否自动
+                        isAuto: true,
+                        contentdown: self.curLangule['key30'],
+                        // 可选，在释放可刷新状态时，下拉刷新控件上显示的标题内容
+                        contentover: self.curLangule['key31'],
+                        // 可选，正在刷新状态时，下拉刷新控件上显示的标题内容
+                        contentrefresh: self.curLangule['key32'],
+                        callback: self.downCallback,
+                    },
+                    up: {
+                        // 默认没有锁定，可以通过API动态设置
+                        isLock: true,
+                    }
+                });
+            }
+        },
+        created: function() {
+
+            this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
+                this.curblock = res[0].height;
+                this.curTime = new Date().getTime();
+            });
+        },
+        mounted() {
+            this.getLanugle();
+            document.title = this.curLangule["title"];
+            this.getVoteDid();
+        }
+    });
+</script>
+
+</html>

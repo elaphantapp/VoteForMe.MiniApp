@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="./js/vue.min.js"></script>
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="./css/reset.css">
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+</head>
+<style type="text/css">
+    body {
+        background: #ffffff;
+    }
+    
+    .xiaoshuo {
+        cursor: pointer;
+    }
+    
+    .first {
+        margin-top: 50px;
+        text-align: center;
+    }
+    
+    .first .singleChoice {
+        width: 220px;
+        height: 44px;
+        line-height: 44px;
+        background: #31AEFF;
+        border-radius: 200px;
+        margin: 0 auto;
+        margin-top: 20px;
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #FFFFFF;
+    }
+    
+    .second {
+        margin-top: 30px;
+        width: 100%;
+        height: 12px;
+        background: #F6F6F6;
+    }
+    
+    .third {
+        margin-top: 50px;
+        text-align: center;
+    }
+    
+    .third .multipleChoice {
+        width: 220px;
+        height: 44px;
+        line-height: 44px;
+        background: #31AEFF;
+        border-radius: 200px;
+        margin: 0 auto;
+        margin-top: 20px;
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #FFFFFF;
+    }
+    
+    .xiaoshuo {
+        cursor: pointer;
+    }
+    
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="app" v-cloak>
+
+        <div class="first xiaoshuo" @click="clickItem('singleChoice')">
+            <img src="./images/singleChoice.png" />
+            <p class="singleChoice">{{curLangule['key']}}</p>
+        </div>
+
+        <div class="second">
+
+        </div>
+
+        <div class="third xiaoshuo" @click="clickItem('multipleChoice')">
+            <img src="./images/multipleChoice.png" />
+            <p class="multipleChoice">{{curLangule['key1']}}</p>
+        </div>
+        <div style="height:30px"></div>
+    </div>
+
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            zh: {
+                title: '增加投票',
+                key: '单选',
+                key1: '多选'
+            },
+            en: {
+                title: 'Add a voting',
+                key: 'Single Choice',
+                key1: 'Multiple Choice'
+            },
+            curLangule: {},
+            toastText: "",
+            toastShow: false,
+        },
+        methods: {
+            clickItem(voteType) {
+                location.href = "./createVote.html?voteType=" + voteType;
+            },
+            getLanugle: function() {
+                this.curLangule = this.en;
+                this.curLanguleKey = 'en';
+                var JsSrc = (navigator.language || navigator.browserLanguage).toLowerCase();
+                if (JsSrc.indexOf('zh') >= 0) {
+                    // 假如浏览器语言是中文
+                    this.curLanguleKey = 'zh';
+                    this.curLangule = this.zh;
+                } else if (JsSrc.indexOf('en') >= 0) {
+                    this.curLangule = this.en;
+                    this.curLanguleKey = 'en';
+                } else {
+                    // 假如浏览器语言是其它语言
+                    this.curLangule = this.en;
+                    this.curLanguleKey = 'en';
+                }
+            }
+        },
+        created: function() {
+
+        },
+        mounted() {
+            this.getLanugle();
+            document.title = this.curLangule["title"];
+        }
+    });
+</script>
+
+</html>

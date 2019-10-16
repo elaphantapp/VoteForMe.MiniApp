@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title></title>
+    <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+    <script src="./js/vue.min.js"></script>
+    <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/lodash.min.js"></script>
+    <script src="./js/vue-datepicker.min.js"></script>
+    <script>
+        Vue.use(DatePicker)
+    </script>
+    <link rel="stylesheet" type="text/css" href="./css/reset.css">
+    <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
+</head>
+<style type="text/css">
+    body {
+        background: #F7F7F7;
+        height: 100%;
+    }
+    
+    .xiaoshuo {
+        cursor: pointer;
+    }
+    
+    .create {
+        width: 232px;
+        margin: 0 auto;
+    }
+    
+    .create p {
+        width: 232px;
+        height: 54px;
+        line-height: 54px;
+        background: #0070C8;
+        border: 1px solid #BDDBFF;
+        box-sizing: border-box;
+        border-radius: 5px;
+        text-align: center;
+        font-family: Roboto;
+        font-style: normal;
+        font-weight: 300;
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+    
+    .xiaoshuo {
+        cursor: pointer;
+    }
+    
+    .hang {
+        margin: 10px 0px;
+        text-align: center;
+    }
+    
+    .hang input {
+        width: 300px;
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #222222;
+        padding-left: 10px;
+        height: 40px;
+        border: 0;
+        border-bottom: 1px solid #EBEBEB;
+    }
+    
+     ::-webkit-input-placeholder {
+        /* Chrome/Opera/Safari */
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #222222;
+    }
+    
+     ::-moz-placeholder {
+        /* Firefox 19+ */
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #222222;
+    }
+    
+     :-ms-input-placeholder {
+        /* IE 10+ */
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #222222;
+    }
+    
+     :-moz-placeholder {
+        /* Firefox 18- */
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #222222;
+    }
+    
+    .hang select {
+        width: 300px;
+        padding-left: 10px;
+        padding-right: 14px;
+        height: 40px;
+        appearance: none;
+        -moz-appearance: none;
+        -webkit-appearance: none;
+    }
+    
+    .hang1 {
+        margin: 10px 0px;
+        text-align: center;
+    }
+    
+    .hang1 .left {
+        width: 30px;
+        padding-left: 10px;
+        height: 40px;
+        border: 0;
+    }
+    
+    .hang1 .right {
+        width: 265px;
+        padding-left: 10px;
+        height: 40px;
+        border: 0;
+        border-bottom: 1px solid #EBEBEB;
+    }
+    
+    .hang2 {
+        margin: 10px 0px;
+        text-align: center;
+    }
+    
+    .hang2 .left {
+        display: inline-block;
+        width: 30px;
+        vertical-align: top;
+    }
+    
+    .hang2 .right {
+        padding-left: 10px;
+        display: inline-block;
+        width: 265px;
+        height: 40px;
+        font-size: 16px;
+        color: #222222;
+        text-align: left;
+        border-bottom: 1px solid #EBEBEB;
+        word-wrap: break-word;
+        overflow: auto;
+    }
+    
+    .hang3 {
+        margin-top: 50px;
+        text-align: center;
+    }
+    
+    .hang3 span {
+        display: inline-block;
+        width: 232px;
+        height: 54px;
+        line-height: 54px;
+        background: #31AEFF;
+        box-sizing: border-box;
+        border-radius: 200px;
+        text-align: center;
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #FFFFFF;
+    }
+    
+    .toast {
+        position: fixed;
+        z-index: 2000;
+        left: 50%;
+        top: 25%;
+        transition: all .5s;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -ms-transform: translateX(-50%) translateY(-50%);
+        -o-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        text-align: center;
+        border-radius: 5px;
+        color: #FFF;
+        background: rgba(17, 17, 17, 0.7);
+        height: 45px;
+        line-height: 45px;
+        padding: 0 15px;
+        width: 100%;
+    }
+    
+    .mx-calendar-content {
+        width: 276px;
+        height: 224px;
+    }
+    
+    .three {
+        position: fixed;
+        width: 300px;
+        margin: 0px auto;
+        left: 0;
+        right: 0;
+        bottom: 34px;
+        margin: 0 auto;
+        height: 48px;
+        line-height: 48px;
+        background: #31AEFF;
+        border-radius: 200px;
+        border-radius: 4px;
+        z-index: 999;
+    }
+    
+    .three p {
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #ffffff;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 100%;
+        bottom: 10px;
+        height: 20px;
+        line-height: 20px;
+        background-color: #fff;
+        text-align: center;
+        color: #31AEFF;
+        margin: 0 auto;
+        z-index: 999;
+    }
+    
+    [v-cloak] {
+        display: none;
+    }
+</style>
+
+<body>
+    <div id="app" v-cloak>
+        <div class="toast" v-show="toastShow">
+            {{toastText}}
+        </div>
+        <div style="background: #ffffff;padding: 10px">
+            <div class="hang"><input :placeholder="curLangule['key2']" v-model="votes.Name" /></div>
+            <div class="hang"><input :placeholder="curLangule['key3']" v-model="votes.Desc" /></div>
+            <div class="hang2" v-for="(item,index) in xuanxiangArr">
+                <span class="right" />{{item.Name}}</span>
+                <span @click="del(index)" class="left"><img src="./images/jian.png"></span>
+            </div>
+            <div class="hang1">
+                <input :placeholder="curLangule['key4']" class="right" v-model="xuanxiangObj.Name" />
+                <span @click="add"><img src="./images/subtract.png"></span>
+            </div>
+            <div style="margin:10px 0px;text-align: center">
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']"></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']"></date-picker>
+            </div>
+            <div style="margin:10px 0px;text-align: center">
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']"></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']"></date-picker>
+            </div>
+        </div>
+        <div style="height:50px;"></div>
+        <div class="three">
+            <p @click="xiayibu">{{curLangule['key5']}}</p>
+        </div>
+        <div class="footer" v-if="this.curTime!=''">
+            {{dateFormat(new Date(this.curTime), 'yyyy-MM-dd HH:mm')}}（{{curLangule['key8']}}：{{curblock}}）
+        </div>
+        <div style="height:30px;"></div>
+    </div>
+    </div>
+</body>
+<script>
+    var app = new Vue({
+        el: '#app',
+        data: {
+            zh: {
+                title: '增加投票',
+                key: '开始日期',
+                key1: '结束日期',
+                key2: '输入主题',
+                key3: '输入更多信息',
+                key4: '添加选项',
+                key5: '创建',
+                key6: '选项重复',
+                key7: '开始时间需要小于结束时间',
+                key8: '当前区块'
+            },
+            en: {
+                title: 'Add a voting',
+                key: 'Input start Date',
+                key1: 'Input end Date',
+                key2: 'Input title',
+                key3: 'Input more details',
+                key4: 'Add option',
+                key5: 'Create',
+                key6: 'Option repeat',
+                key7: 'Start time needs to be less than end time',
+                key8: 'Current Block'
+            },
+            curLangule: {},
+            schemeConfig: {
+                "AppID": "3461ba97b110118ed25a66697e021004e3de05a52c05bb10470619d73d3932a59c59e81a6f6621f22dfc9b0182df5891d13bd2afcb86cb8665d02e608f03b3cf",
+                "AppName": encodeURIComponent("Vote For Me"),
+                "DID": "ibxNTG1hBPK1rZuoc8fMy4eFQ96UYDAQ4J",
+                "PublicKey": "034c51ddc0844ff11397cc773a5b7d94d5eed05e7006fb229cf965b47f19d27c55",
+                "RequestedContent": "",
+                "UseStatement": "didvote",
+                "ReturnUrl": "",
+            },
+            toastText: "",
+            toastShow: false,
+            xuanxiangArr: [],
+            xuanxiangObj: {
+                OptionID: "",
+                Name: "",
+                Desc: ""
+            },
+            votes: {
+                Name: "",
+                Desc: "",
+                Type: "singleChoice",
+                "Max-Selections": "",
+                "Starting-height": "",
+                "End-height": "",
+                Options: []
+            },
+            startTime: new Date(),
+            endTime: new Date(),
+            curLanguleKey: "",
+            curblock: '',
+            curTime: '',
+        },
+        methods: {
+            dateFormat(date, sFormat) {
+                let time = {
+                    Year: 0,
+                    TYear: '0',
+                    Month: 0,
+                    TMonth: '0',
+                    Day: 0,
+                    TDay: '0',
+                    Hour: 0,
+                    THour: '0',
+                    hour: 0,
+                    Thour: '0',
+                    Minute: 0,
+                    TMinute: '0',
+                    Second: 0,
+                    TSecond: '0',
+                    Millisecond: 0
+                };
+                time.Year = date.getFullYear();
+                time.TYear = String(time.Year).substr(2);
+                time.Month = date.getMonth() + 1;
+                time.TMonth = time.Month < 10 ? "0" + time.Month : String(time.Month);
+                time.Day = date.getDate();
+                time.TDay = time.Day < 10 ? "0" + time.Day : String(time.Day);
+                time.Hour = date.getHours();
+                time.THour = time.Hour < 10 ? "0" + time.Hour : String(time.Hour);
+                time.hour = time.Hour < 13 ? time.Hour : time.Hour - 12;
+                time.Thour = time.hour < 10 ? "0" + time.hour : String(time.hour);
+                time.Minute = date.getMinutes();
+                time.TMinute = time.Minute < 10 ? "0" + time.Minute : String(time.Minute);
+                time.Second = date.getSeconds();
+                time.TSecond = time.Second < 10 ? "0" + time.Second : String(time.Second);
+                time.Millisecond = date.getMilliseconds();
+
+                return sFormat.replace(/yyyy/ig, String(time.Year))
+                    .replace(/yyy/ig, String(time.Year))
+                    .replace(/yy/ig, time.TYear)
+                    .replace(/y/ig, time.TYear)
+                    .replace(/MM/g, time.TMonth)
+                    .replace(/M/g, String(time.Month))
+                    .replace(/dd/ig, time.TDay)
+                    .replace(/d/ig, String(time.Day))
+                    .replace(/HH/g, time.THour)
+                    .replace(/H/g, String(time.Hour))
+                    .replace(/hh/g, time.Thour)
+                    .replace(/h/g, String(time.hour))
+                    .replace(/mm/g, time.TMinute)
+                    .replace(/m/g, String(time.Minute))
+                    .replace(/ss/ig, time.TSecond)
+                    .replace(/s/ig, String(time.Second))
+                    .replace(/fff/ig, String(time.Millisecond))
+            },
+            getUrl() {
+                //获取主机地址
+                var localhostPaht = window.location.protocol + "//" + window.location.host;
+                return localhostPaht;
+            },
+            getUrlParam: function(name) {
+                //正则表达式过滤
+                var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
+                //正则规则
+                var r = window.location.search.substr(1).match(reg);
+
+                if (r != null) return decodeURI(r[2]);
+                return null;
+            },
+            getAjax(url) {
+                return new Promise((resovle, reject) => {
+                    $.ajax({
+                        url: url,
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function(data) { //成功回调函数
+                            resovle(data);
+                        },
+                        error: function(err) { //失败回调函数
+                            reject(err);
+                        }
+                    });
+                });
+            },
+            xiayibu() {
+                if (this.votes['Name'] === '') {
+                    this.toast(this.curLangule['key2']);
+                    return;
+                }
+                if (this.xuanxiangArr.length <= 1) {
+                    this.toast(this.curLangule['key4']);
+                    return;
+                }
+                this.votes["Starting-height-alias"] = parseInt((new Date(this.startTime).getTime() / 1000));
+                this.votes["End-height-alias"] = parseInt((new Date(this.endTime).getTime() / 1000));
+                if (this.votes["Starting-height-alias"] > this.votes["End-height-alias"]) {
+                    this.toast(this.curLangule['key7']);
+                    return;
+                }
+                this.votes["Starting-height"] = this.getBHeight(this.votes["Starting-height-alias"]);
+                this.votes["End-height"] = this.getBHeight(this.votes["End-height-alias"]);
+                this.votes.Options = _.cloneDeep(this.xuanxiangArr);
+                this.votes['Max-Selections'] = this.votes.Options.length;
+                var objStr = JSON.stringify(this.votes);
+                console.log(JSON.stringify(this.votes));
+                var url = this.buildSign(objStr);
+                var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
+                location.href = turl;
+            },
+            getBHeight(curTime) {
+                var height = this.votes["Starting-height"] + (curTime - this.votes["Starting-height-alias"]) / 180;
+                return parseInt(height);
+            },
+            buildSign(objStr) {
+                this.schemeConfig['RequestedContent'] = objStr;
+                var baseUrl = this.getUrl();
+                if (baseUrl === "file://") {
+                    baseUrl = 'http://dev1.elapps.net';
+                }
+                this.schemeConfig['ReturnUrl'] = baseUrl + '/previewVote.html';
+                var url = "elaphant://sign?";
+                _.forEach(this.schemeConfig, function(val, key, index) {
+                    if (key === 'ReturnUrl' || key === 'RequestInfo' || key === 'RequestedContent') {
+                        val = encodeURIComponent(val);
+                    }
+                    url += key + '=' + val + '&';
+                });
+
+                return url.substring(0, url.length - 1);
+            },
+            toast(str) {
+                var v = this;
+                v.toastText = str
+                v.toastShow = true
+                setTimeout(function() {
+                    v.toastShow = false;
+                }, 1500)
+            },
+            getLanugle: function() {
+                this.curLangule = this.en;
+                this.curLanguleKey = 'en';
+                var JsSrc = (navigator.language || navigator.browserLanguage).toLowerCase();
+                if (JsSrc.indexOf('zh') >= 0) {
+                    // 假如浏览器语言是中文
+                    this.curLanguleKey = 'zh';
+                    this.curLangule = this.zh;
+                } else if (JsSrc.indexOf('en') >= 0) {
+                    this.curLangule = this.en;
+                    this.curLanguleKey = 'en';
+                } else {
+                    // 假如浏览器语言是其它语言
+                    this.curLangule = this.en;
+                    this.curLanguleKey = 'en';
+                }
+            },
+            getNumber() {
+                var arr = _.cloneDeep(this.xuanxiangArr);
+                arr = _.sortBy(arr, function(item) {
+                    return -item["OptionID"];
+                });
+
+                var num = 1;
+
+                if (arr.length > 0) {
+                    num = arr[0]["OptionID"] + 1;
+                }
+
+                return num;
+            },
+            isExit(arr, name) {
+                for (var index = 0; index < arr.length; index++) {
+                    var item = arr[index];
+                    var iname = item['Name'];
+                    if (name === iname) {
+                        return true;
+                    }
+                }
+
+                return false;
+            },
+            add() {
+                this.xuanxiangObj.OptionID = this.getNumber();
+                if (this.xuanxiangObj.Name == "") {
+                    this.toast(this.curLangule['key4']);
+                    return false;
+                }
+
+                if (this.isExit(this.xuanxiangArr, this.xuanxiangObj.Name)) {
+                    this.toast(this.curLangule['key6']);
+                    return false;
+                }
+
+                var item = _.cloneDeep(this.xuanxiangObj);
+                this.xuanxiangArr.push(item);
+                this.xuanxiangObj = {
+                    OptionID: "",
+                    Name: "",
+                    Desc: ""
+                };
+
+            },
+            del(index) {
+                this.xuanxiangArr.splice(index, 1);
+            }
+        },
+        created: function() {
+            this.votes['Type'] = this.getUrlParam('voteType') || 'singleChoice';
+            this.xuanxiangArr = this.votes.Options;
+            this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
+                this.curblock = res[0].height;
+                this.curTime = new Date().getTime();
+                this.votes["Starting-height"] = res[0].height;
+                this.startTime = new Date();
+                this.endTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 6);
+                this.votes["Starting-height-alias"] = parseInt((new Date(this.startTime).getTime() / 1000));
+                this.votes["End-height-alias"] = parseInt((new Date(this.endTime).getTime() / 1000));
+                var height = this.getBHeight(this.votes["End-height-alias"]);
+                this.votes["End-height"] = height;
+            });
+        },
+        mounted() {
+            this.getLanugle();
+            document.title = this.curLangule["title"];
+        }
+    });
+</script>
+
+</html>
