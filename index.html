@@ -536,7 +536,9 @@
     
     .footer {
         position: fixed;
-        width: 100%;
+        width: 300px;
+        left: 0;
+        right: 0;
         bottom: 10px;
         height: 20px;
         line-height: 20px;
@@ -568,7 +570,7 @@
             <div class="minirefresh-scroll">
                 <div class="data-list">
                     <div class="list" v-if="tabIndex===0">
-                        <div style="margin-top: 20px;text-align:center;padding:0px 10px" v-if="!loading&&didVoteArr.length===0">暂无发送的交易</div>
+                        <div style="margin-top: 20px;text-align:center;padding:0px 10px" v-if="!loading&&didVoteArr.length===0">{{curLangule['key8']}}</div>
                         <div class="hang" v-for="(item,index) in didVoteArr" @click="clickItem(item)">
                             <div class="top">
                                 <span>{{item["RequestedConent"]["Name"]}}</span>
@@ -588,7 +590,7 @@
 
                     <div class="list" v-if="tabIndex===1">
                         <div style="margin-top: 20px;text-align:center;padding:0px 10px" v-if="!loading&&Object.keys(didList).length===0">{{curLangule['key8']}}</div>
-                        <div class="hang" v-for="(item,index) in didList" @click="clickItem(item)">
+                        <div class="hang" v-for="(item,index) in didArr" @click="clickItem(item)">
                             <div class="top1">
                                 <span class="huanhang">{{item["txHash"]}}</span>
                             </div>
@@ -663,7 +665,8 @@
             didList: {},
             wholeData: {},
             curblock: '',
-            curTime: ''
+            curTime: '',
+            didArr: [],
         },
         methods: {
             getVoteDid() {
@@ -781,6 +784,11 @@
                     this.didList = {};
                 } else {
                     this.didList = JSON.parse(hashList);
+                    var arr1 = _.cloneDeep(Object.values(this.didList));
+                    arr1 = _.sortBy(arr1, function(item) {
+                        return -item["createTime"];
+                    });
+                    this.didArr = arr1;
                 }
                 var arr = Object.keys(this.didList);
                 for (var index = 0; index < arr.length; index++) {
@@ -789,6 +797,11 @@
                     this.getAjax(url).then((res) => {
                         if (res.length > 0) {
                             Vue.delete(this.didList, txId);
+                            let arr2 = _.cloneDeep(Object.values(this.didList));
+                            arr2 = _.sortBy(arr2, function(item) {
+                                return -item["createTime"];
+                            });
+                            this.didArr = arr2;
                             localStorage.setItem('did-vote-sendTx-hashList', JSON.stringify(this.didList));
                         }
                     });
