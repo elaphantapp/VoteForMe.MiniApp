@@ -71,28 +71,28 @@
         /* Chrome/Opera/Safari */
         font-family: Bio Sans;
         font-size: 16px;
-        color: #222222;
+        /* color: #222222; */
     }
     
      ::-moz-placeholder {
         /* Firefox 19+ */
         font-family: Bio Sans;
         font-size: 16px;
-        color: #222222;
+        /* color: #222222; */
     }
     
      :-ms-input-placeholder {
         /* IE 10+ */
         font-family: Bio Sans;
         font-size: 16px;
-        color: #222222;
+        /* color: #222222; */
     }
     
      :-moz-placeholder {
         /* Firefox 18- */
         font-family: Bio Sans;
         font-size: 16px;
-        color: #222222;
+        /* color: #222222; */
     }
     
     .hang select {
@@ -285,19 +285,21 @@
                 key5: '创建',
                 key6: '选项不能重复',
                 key7: '开始时间需要小于结束时间',
-                key8: '当前区块'
+                key8: '当前区块',
+                key9: '结束时间不能早于当前时间'
             },
             en: {
                 title: 'Create a voting',
-                key: 'Input start Time',
-                key1: 'Input end Time',
+                key: 'Input start time',
+                key1: 'Input end  time',
                 key2: 'Input title',
                 key3: 'Input more details',
                 key4: 'Add option',
                 key5: 'Create',
                 key6: 'Option cannot be repeated',
                 key7: 'Start time needs to be less than end time',
-                key8: 'Current Block'
+                key8: 'Current Block',
+                key9: 'End time cannot be earlier than current time'
             },
             curLangule: {},
             schemeConfig: {
@@ -415,6 +417,7 @@
                 });
             },
             xiayibu() {
+
                 if (this.votes['Name'] === '') {
                     this.toast(this.curLangule['key2']);
                     return;
@@ -423,10 +426,25 @@
                     this.toast(this.curLangule['key4']);
                     return;
                 }
+
+                if (this.startTime === null) {
+                    this.toast(this.curLangule['key']);
+                    return;
+                }
+
+                if (this.endTime === null) {
+                    this.toast(this.curLangule['key1']);
+                    return;
+                }
                 this.votes["Starting-height-alias"] = parseInt((new Date(this.startTime).getTime() / 1000));
                 this.votes["End-height-alias"] = parseInt((new Date(this.endTime).getTime() / 1000));
                 if (this.votes["Starting-height-alias"] > this.votes["End-height-alias"]) {
                     this.toast(this.curLangule['key7']);
+                    return;
+                }
+
+                if (this.votes["End-height-alias"] < this.votes["Starting-height-alias"]) {
+                    this.toast(this.curLangule['key9']);
                     return;
                 }
                 this.votes["Starting-height"] = this.getBHeight(this.votes["Starting-height-alias"]);
@@ -440,7 +458,8 @@
                 location.href = turl;
             },
             getBHeight(curTime) {
-                var height = this.votes["Starting-height"] + (curTime - this.votes["Starting-height-alias"]) / 180;
+                var cur = parseInt(this.curTime / 1000);
+                var height = this.curblock + (curTime - cur) / 180;
                 return parseInt(height);
             },
             buildSign(objStr) {

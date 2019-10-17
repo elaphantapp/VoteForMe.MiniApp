@@ -765,12 +765,16 @@
                             sitem["txid"] = item["txid"];
                             var requestedConent = sitem["RequestedConent"] || sitem["RequestedContent"];
                             sitem["RequestedConent"] = JSON.parse(requestedConent);
-                            arr.push(sitem);
+                            if (sitem["RequestedConent"]["Name"] && sitem["RequestedConent"]["Starting-height-alias"]) {
+                                arr.push(sitem);
+                            }
+
+
                         }
                     }
                 }
                 arr = _.sortBy(arr, function(item) {
-                    return -item["RequestedConent"]["End-height-alias"];
+                    return item["RequestedConent"]["Starting-height-alias"];
                 });
                 return arr;
             },
@@ -842,6 +846,7 @@
                 if (this.tabIndex === 0) {
                     this.getAjax(url).then((res) => {
                         this.didVoteArr = this.handleDate(res);
+                        console.log("==============" + JSON.stringify(this.didVoteArr));
                         this.loading = false;
                         this.miniRefresh.endDownLoading(false);
                     }).catch((err) => {

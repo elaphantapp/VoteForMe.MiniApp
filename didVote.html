@@ -171,7 +171,7 @@
     .first {
         position: fixed;
         width: 100%;
-        height: 220px;
+        height: 164px;
         left: 0px;
         top: 0px;
         background: linear-gradient(180deg, #569AFF 0%, #64C2FF 100%);
@@ -184,7 +184,7 @@
         width: 128px;
         height: 132px;
         right: 0px;
-        top: 88px;
+        top: 31px;
         z-index: 2;
     }
     
@@ -198,7 +198,7 @@
     }
     
     .first .name {
-        margin-top: 60px;
+        margin-top: 24px;
         font-family: Bio Sans;
         font-size: 24px;
         color: #FFFFFF;
@@ -227,7 +227,7 @@
     
     .second {
         position: fixed;
-        top: 220px;
+        top: 164px;
         width: 100%;
         height: 40px;
         line-height: 40px;
@@ -425,15 +425,14 @@
             <div class="type" v-if="chainObj['Type']==='multipleChoice'"><span>{{curLangule['key5']}}</span>[{{curLangule['key4']}}]</div>
             <div class="des" v-if="chainObj['Type']==='singleChoice'">{{curLangule['key1']}}</div>
             <div class="des" v-if="chainObj['Type']==='multipleChoice'">{{curLangule['key2']}}</div>
-            <div class="pback"><img src="./images/pback.png" /></div>
             <div class="leftback"><img src="./images/leftback.png" /></div>
         </div>
         <div class="second">
             <img src="./images/lingdang.png" />
-            <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -45px;margin-left: 41px;">{{dateFormat(new Date(chainObj['Starting-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}（ {{curLangule['key15']}}：{{parseInt(chainObj['Starting-height'])}} ）</div>
+            <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -49px;margin-left: 41px;">{{dateFormat(new Date(chainObj['Starting-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}（ {{curLangule['key15']}}：{{parseInt(chainObj['Starting-height'])}} ）</div>
             <div v-if="chainObj['Starting-height-alias']" style="font-size: 12px;margin-top: -23px;margin-left: 41px;"> {{dateFormat(new Date(chainObj['End-height-alias'] * 1000), 'yyyy-MM-dd HH:mm')}}（ {{curLangule['key15']}}：{{parseInt(chainObj['End-height'])}} ）</div>
         </div>
-        <div style="height:260px"></div>
+        <div style="height:200px"></div>
         <div class="list">
             <div class="hang" v-for="(item,index) in chainObj['Options']" v-if="chainObj['Type']==='singleChoice'" :class="{'bule':selectObj[item.OptionID]}">
                 <div class="noSelect" v-if="!selectObj[item.OptionID]" @click="clicksItem(item)">
@@ -500,8 +499,8 @@
             zh: {
                 title: 'DID投票',
                 key: '提交',
-                key1: '您最多可以选择1个选项',
-                key2: '您可以选择2个选项 ',
+                key1: '您只能选择1个选项',
+                key2: '您至少选择1个选项',
                 key3: '单选',
                 key4: '多选',
                 key5: '投票详情',
@@ -519,8 +518,8 @@
             en: {
                 title: 'DID Voting',
                 key: 'Submit',
-                key1: 'You can select up to 1 options',
-                key2: 'You can select up to 2 options',
+                key1: 'You can only choose 1 options',
+                key2: 'You select at least 1 options',
                 key3: 'Single Choice',
                 key4: 'Multiple Choice',
                 key5: 'Voting details',

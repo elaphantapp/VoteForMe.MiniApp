@@ -227,9 +227,6 @@
         </div>
         <div style="margin-top: 30px;font-size: 16px;text-align: center">{{curLangule['key1']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center">{{curLangule['key2']}}</div>
-        <!-- <div class="three" v-if="!isFaile&&!loading">
-            <p @click="shanglian">{{curLangule['key']}}</p>
-        </div> -->
     </div>
 </body>
 <script>
@@ -240,13 +237,15 @@
                 title: '投票',
                 key: '提交',
                 key1: '已签名成功',
-                key2: '投票数据正在上链，请稍候。'
+                key2: '投票数据正在上链，请稍候。',
+                key3: '上链失败'
             },
             en: {
                 title: 'Voting',
                 key: 'Submit',
                 key1: 'Signed successfully',
-                key2: 'Voting data is being submitted to the blockchain, please wait.'
+                key2: 'Voting data is being submitted to the blockchain, please wait.',
+                key3: '上链失败'
             },
             curLangule: {},
             toastText: "",
