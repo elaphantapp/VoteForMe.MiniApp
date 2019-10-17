@@ -130,29 +130,6 @@
         cursor: pointer;
     }
     
-    .three {
-        position: fixed;
-        width: 300px;
-        margin: 0px auto;
-        left: 0;
-        right: 0;
-        bottom: 34px;
-        margin: 0 auto;
-        height: 48px;
-        line-height: 48px;
-        background: #31AEFF;
-        border-radius: 200px;
-        border-radius: 4px;
-        z-index: 999;
-    }
-    
-    .three p {
-        font-family: Bio Sans;
-        font-size: 16px;
-        text-align: center;
-        color: #ffffff;
-    }
-    
     .spinner {
         display: block;
         margin: 100px auto 0;
@@ -207,6 +184,44 @@
         }
     }
     
+    .four {
+        position: fixed;
+        width: 300px;
+        margin: 0px auto;
+        left: 0;
+        right: 0;
+        top: 107px;
+        z-index: 999;
+    }
+    
+    .four .left {
+        display: inline-block;
+        width: 130px;
+        margin-right: 15px;
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #ffffff;
+        height: 48px;
+        line-height: 48px;
+        background: #31AEFF;
+        border-radius: 200px;
+    }
+    
+    .four .right {
+        display: inline-block;
+        width: 130px;
+        margin-left: 15px;
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #ffffff;
+        height: 48px;
+        line-height: 48px;
+        background: #31AEFF;
+        border-radius: 200px;
+    }
+    
     [v-cloak] {
         display: none;
     }
@@ -226,10 +241,17 @@
             <div class="bounce3"></div>
         </div>
         <div style="margin-top: 30px;font-size: 16px;text-align: center">{{curLangule['key1']}}</div>
-        <div style="margin-top: 5px;font-size: 16px;text-align: center">{{curLangule['key2']}}</div>
-        <!-- <div class="three">
-            <p @click="shanglian">{{curLangule['key']}}</p>
-        </div> -->
+        <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isFail">{{curLangule['key2']}}</div>
+        <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="isFail&&!loading">{{curLangule['key3']}}</div>
+        <div class="four" v-if="isFail&&!loading">
+            <span @click="back" class="left">
+                {{curLangule['key4']}}
+            </span>
+
+            <span @click="shanglian" class="right">
+                {{curLangule['key']}}
+            </span>
+        </div>
     </div>
 </body>
 <script>
@@ -240,13 +262,17 @@
                 title: '投票',
                 key: '提交',
                 key1: '已签名成功',
-                key2: '投票数据正在上链，请稍候。'
+                key2: '投票数据正在上链，请稍候。',
+                key3: '发送交易失败',
+                key4: '返回主页'
             },
             en: {
                 title: 'Voting',
                 key: 'Submit',
                 key1: 'Signed successfully',
-                key2: 'Voting data is being submitted to the blockchain, please wait.'
+                key2: 'Voting data is being submitted to the blockchain, please wait.',
+                key3: 'Sending transaction failed',
+                key4: 'Back Home'
             },
             curLangule: {},
             toastText: "",
@@ -254,9 +280,13 @@
             chainObj: {},
             sign: "",
             DataStr: "",
-            loading: true
+            loading: true,
+            isFail: false,
         },
         methods: {
+            back() {
+                location.href = "./index.html";
+            },
             postAjax(url, parms) {
                 return new Promise((resovle, reject) => {
                     $.ajax({
@@ -276,7 +306,8 @@
             },
             shanglian() {
                 this.loading = true;
-                var url = "http://54.178.212.109:8095/api/1/didvoting/save";
+                this.isFail = false;
+                var url = "https://api-voteforme.elaphant.net/api/1/didvoting/save";
                 var obj = {};
                 obj["Signature"] = this.sign;
                 obj["DataStr"] = this.DataStr;
@@ -289,14 +320,15 @@
                 this.postAjax(url, parms).then((res) => {
 
                     if (res.state === 200) {
-                        this.loading = false;
                         location.href = "./result.html?txId=" + res.data.txid + '&type=createVote';
                     } else {
                         this.loading = false;
+                        this.isFail = true;
                         this.toast(JSON.stringify(res));
                     }
                 }).catch((err) => {
                     this.loading = false;
+                    this.isFail = true;
                     console.log("====err====" + JSON.stringify(err));
                 })
             },

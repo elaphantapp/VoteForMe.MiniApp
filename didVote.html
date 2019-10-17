@@ -601,7 +601,7 @@
 
             },
             getVoteDid() {
-                this.getAjax('http://54.178.212.109:8095/api/1/didvoting/did').then((res) => {
+                this.getAjax('https://api-voteforme.elaphant.net/api/1/didvoting/did').then((res) => {
                     var data = res.data;
                     if (res['state'] === 200) {
                         this.chainDid = data['did'];
