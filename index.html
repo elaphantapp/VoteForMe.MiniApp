@@ -28,18 +28,19 @@
     }
     
     .list .hang {
-        height: 85px;
+        height: 98px;
         margin-bottom: 10px;
         background: rgba(208, 214, 255, 0.2);
         border-radius: 5px;
     }
     
     .list .hang .top {
+        /* position: relative; */
         margin: 0px 15px;
-        height: 42px;
+        /* height: 42px; */
         /* line-height: 42px; */
         border-bottom: 1px solid #D8DAE1;
-        overflow: auto;
+        /* overflow: auto; */
     }
     
     .list .hang .top1 {
@@ -576,7 +577,10 @@
                         <div style="margin-top: 20px;text-align:center;padding:0px 10px" v-if="!loading&&didVoteArr.length===0">{{curLangule['key8']}}</div>
                         <div class="hang" v-for="(item,index) in didVoteArr" @click="clickItem(item)">
                             <div class="top">
-                                <span>{{item["RequestedConent"]["Name"]}}</span>
+                                <span style="display:inline-block;width: 75%;overflow:auto;height:42px">{{item["RequestedConent"]["Name"]}}</span>
+                                <span style="position: absolute;right:30px;color:#ffac38" v-if="item['RequestedConent']['Starting-height-alias']>curTime">{{curLangule['key10']}}</span>
+                                <span style="position: absolute;right:30px;color:#99cc99" v-if="item['RequestedConent']['Starting-height-alias']<=curTime&&item['RequestedConent']['End-height-alias']>curTime">{{curLangule['key11']}}</span>
+                                <span style="position: absolute;right:30px;color:#ddd" v-if="item['RequestedConent']['End-height-alias']<=curTime">{{curLangule['key12']}}</span>
                             </div>
                             <div class="bottom">
                                 <div class="hang1">
@@ -615,7 +619,7 @@
         </div>
 
         <div class="footer" v-if="this.curTime!=''">
-            {{dateFormat(new Date(this.curTime), 'yyyy-MM-dd HH:mm')}}（{{curLangule['key9']}}：{{curblock}}）
+            {{dateFormat(new Date(this.curTime*1000), 'yyyy-MM-dd HH:mm')}}（{{curLangule['key9']}}：{{curblock}}）
         </div>
     </div>
 
@@ -636,6 +640,9 @@
                 key7: '创建投票',
                 key8: '没有数据',
                 key9: '当前区块',
+                key10: '准备中',
+                key11: '进行中',
+                key12: '已结束',
                 key30: '下拉刷新',
                 key31: '',
                 key32: '加载中...'
@@ -651,6 +658,9 @@
                 key6: 'Voted Time',
                 key7: 'Create a voting',
                 key8: 'No Data',
+                key10: 'Preparing',
+                key11: 'In progress',
+                key12: 'End',
                 key9: 'Current Block',
                 key30: 'Pull down to refresh',
                 key31: '',
@@ -765,6 +775,7 @@
                         if (str != "") {
                             var sitem = JSON.parse(decodeURIComponent(str));
                             sitem["property_key"] = item["property_key"];
+                            sitem["block_time"] = item["block_time"];
                             sitem["txid"] = item["txid"];
                             var requestedConent = sitem["RequestedConent"] || sitem["RequestedContent"];
                             sitem["RequestedConent"] = JSON.parse(requestedConent);
@@ -777,7 +788,7 @@
                     }
                 }
                 arr = _.sortBy(arr, function(item) {
-                    return item["RequestedConent"]["Starting-height-alias"];
+                    return -item["block_time"];
                 });
                 return arr;
             },
@@ -892,7 +903,8 @@
 
             this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
                 this.curblock = res[0].height;
-                this.curTime = new Date().getTime();
+
+                this.curTime = parseInt(new Date().getTime() / 1000);
             });
         },
         mounted() {
