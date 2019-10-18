@@ -9,122 +9,17 @@
     <script src="./js/vue.min.js"></script>
     <script src="./js/jquery-3.2.1.min.js"></script>
     <script src="./js/lodash.min.js"></script>
-    <script src="./js/vue-clipboard.min.js"></script>
     <script src="./js/vue-datepicker.min.js"></script>
     <script>
         Vue.use(DatePicker)
-    </script>
-    <script>
-        var sha256 = function sha256(ascii) {
-            function rightRotate(value, amount) {
-                return (value >>> amount) | (value << (32 - amount));
-            };
-
-            var mathPow = Math.pow;
-            var maxWord = mathPow(2, 32);
-            var lengthProperty = 'length'
-            var i, j; // Used as a counter across the whole file
-            var result = ''
-
-            var words = [];
-            var asciiBitLength = ascii[lengthProperty] * 8;
-
-            //* caching results is optional - remove/add slash from front of this line to toggle
-            // Initial hash value: first 32 bits of the fractional parts of the square roots of the first 8 primes
-            // (we actually calculate the first 64, but extra values are just ignored)
-            var hash = sha256.h = sha256.h || [];
-            // Round constants: first 32 bits of the fractional parts of the cube roots of the first 64 primes
-            var k = sha256.k = sha256.k || [];
-            var primeCounter = k[lengthProperty];
-            /*/
-            var hash = [], k = [];
-            var primeCounter = 0;
-            //*/
-
-            var isComposite = {};
-            for (var candidate = 2; primeCounter < 64; candidate++) {
-                if (!isComposite[candidate]) {
-                    for (i = 0; i < 313; i += candidate) {
-                        isComposite[i] = candidate;
-                    }
-                    hash[primeCounter] = (mathPow(candidate, .5) * maxWord) | 0;
-                    k[primeCounter++] = (mathPow(candidate, 1 / 3) * maxWord) | 0;
-                }
-            }
-
-            ascii += '\x80' // Append Ƈ' bit (plus zero padding)
-            while (ascii[lengthProperty] % 64 - 56) ascii += '\x00' // More zero padding
-            for (i = 0; i < ascii[lengthProperty]; i++) {
-                j = ascii.charCodeAt(i);
-                if (j >> 8) return; // ASCII check: only accept characters in range 0-255
-                words[i >> 2] |= j << ((3 - i) % 4) * 8;
-            }
-            words[words[lengthProperty]] = ((asciiBitLength / maxWord) | 0);
-            words[words[lengthProperty]] = (asciiBitLength)
-
-            // process each chunk
-            for (j = 0; j < words[lengthProperty];) {
-                var w = words.slice(j, j += 16); // The message is expanded into 64 words as part of the iteration
-                var oldHash = hash;
-                // This is now the undefinedworking hash", often labelled as variables a...g
-                // (we have to truncate as well, otherwise extra entries at the end accumulate
-                hash = hash.slice(0, 8);
-
-                for (i = 0; i < 64; i++) {
-                    var i2 = i + j;
-                    // Expand the message into 64 words
-                    // Used below if 
-                    var w15 = w[i - 15],
-                        w2 = w[i - 2];
-
-                    // Iterate
-                    var a = hash[0],
-                        e = hash[4];
-                    var temp1 = hash[7] +
-                        (rightRotate(e, 6) ^ rightRotate(e, 11) ^ rightRotate(e, 25)) // S1
-                        +
-                        ((e & hash[5]) ^ ((~e) & hash[6])) // ch
-                        +
-                        k[i]
-                        // Expand the message schedule if needed
-                        +
-                        (w[i] = (i < 16) ? w[i] : (
-                            w[i - 16] +
-                            (rightRotate(w15, 7) ^ rightRotate(w15, 18) ^ (w15 >>> 3)) // s0
-                            +
-                            w[i - 7] +
-                            (rightRotate(w2, 17) ^ rightRotate(w2, 19) ^ (w2 >>> 10)) // s1
-                        ) | 0);
-                    // This is only used once, so *could* be moved below, but it only saves 4 bytes and makes things unreadble
-                    var temp2 = (rightRotate(a, 2) ^ rightRotate(a, 13) ^ rightRotate(a, 22)) // S0
-                        +
-                        ((a & hash[1]) ^ (a & hash[2]) ^ (hash[1] & hash[2])); // maj
-
-                    hash = [(temp1 + temp2) | 0].concat(hash); // We don't bother trimming off the extra ones, they're harmless as long as we're truncating when we do the slice()
-                    hash[4] = (hash[4] + temp1) | 0;
-                }
-
-                for (i = 0; i < 8; i++) {
-                    hash[i] = (hash[i] + oldHash[i]) | 0;
-                }
-            }
-
-            for (i = 0; i < 8; i++) {
-                for (j = 3; j + 1; j--) {
-                    var b = (hash[i] >> (j * 8)) & 255;
-                    result += ((b < 16) ? 0 : '') + b.toString(16);
-                }
-            }
-            return result;
-        };
-        Vue.prototype.$sha256 = sha256;
     </script>
     <link rel="stylesheet" type="text/css" href="./css/reset.css">
     <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
 </head>
 <style type="text/css">
     body {
-        background: #F2F9FF;
+        background: #F7F7F7;
+        height: 100%;
     }
     
     .xiaoshuo {
@@ -163,8 +58,41 @@
     
     .hang input {
         width: 300px;
+        font-family: Bio Sans;
+        font-size: 16px;
+        color: #222222;
         padding-left: 10px;
         height: 40px;
+        border: 0;
+        border-bottom: 1px solid #EBEBEB;
+    }
+    
+     ::-webkit-input-placeholder {
+        /* Chrome/Opera/Safari */
+        font-family: Bio Sans;
+        font-size: 16px;
+        /* color: #222222; */
+    }
+    
+     ::-moz-placeholder {
+        /* Firefox 19+ */
+        font-family: Bio Sans;
+        font-size: 16px;
+        /* color: #222222; */
+    }
+    
+     :-ms-input-placeholder {
+        /* IE 10+ */
+        font-family: Bio Sans;
+        font-size: 16px;
+        /* color: #222222; */
+    }
+    
+     :-moz-placeholder {
+        /* Firefox 18- */
+        font-family: Bio Sans;
+        font-size: 16px;
+        /* color: #222222; */
     }
     
     .hang select {
@@ -183,34 +111,18 @@
     }
     
     .hang1 .left {
-        width: 80px;
+        width: 30px;
         padding-left: 10px;
         height: 40px;
         border: 0;
     }
     
     .hang1 .right {
-        width: 160px;
+        width: 265px;
         padding-left: 10px;
         height: 40px;
         border: 0;
-    }
-    
-    .hang1 span {
-        display: inline-block;
-        width: 60px;
-        height: 40px;
-        line-height: 40px;
-        background: #0070C8;
-        border: 1px solid #BDDBFF;
-        box-sizing: border-box;
-        border-radius: 5px;
-        text-align: center;
-        font-family: Roboto;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 16px;
-        color: #FFFFFF;
+        border-bottom: 1px solid #EBEBEB;
     }
     
     .hang2 {
@@ -220,48 +132,21 @@
     
     .hang2 .left {
         display: inline-block;
-        width: 120px;
-        height: 40px;
-        line-height: 40px;
-        font-family: Roboto;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 16px;
-        background: #FFFFFF;
-        color: inherit;
-    }
-    
-    .hang2 .middle {
-        display: inline-block;
-        width: 120px;
-        height: 40px;
-        line-height: 40px;
-        box-sizing: border-box;
-        border-radius: 5px;
-        text-align: center;
-        font-family: Roboto;
-        font-style: normal;
-        font-weight: 300;
-        font-size: 16px;
-        background: #FFFFFF;
-        color: inherit;
+        width: 30px;
+        vertical-align: top;
     }
     
     .hang2 .right {
+        padding-left: 10px;
         display: inline-block;
-        width: 60px;
+        width: 265px;
         height: 40px;
-        line-height: 40px;
-        background: #0070C8;
-        border: 1px solid #BDDBFF;
-        box-sizing: border-box;
-        border-radius: 5px;
-        text-align: center;
-        font-family: Roboto;
-        font-style: normal;
-        font-weight: 300;
         font-size: 16px;
-        color: #FFFFFF;
+        color: #222222;
+        text-align: left;
+        border-bottom: 1px solid #EBEBEB;
+        word-wrap: break-word;
+        overflow: auto;
     }
     
     .hang3 {
@@ -274,14 +159,11 @@
         width: 232px;
         height: 54px;
         line-height: 54px;
-        background: #0070C8;
-        border: 1px solid #BDDBFF;
+        background: #31AEFF;
         box-sizing: border-box;
-        border-radius: 5px;
+        border-radius: 200px;
         text-align: center;
-        font-family: Roboto;
-        font-style: normal;
-        font-weight: 300;
+        font-family: Bio Sans;
         font-size: 16px;
         color: #FFFFFF;
     }
@@ -312,6 +194,42 @@
         height: 224px;
     }
     
+    .three {
+        position: fixed;
+        width: 220px;
+        left: 0;
+        right: 0;
+        bottom: 34px;
+        height: 44px;
+        line-height: 44px;
+        background: #31AEFF;
+        border-radius: 200px;
+        margin: 0 auto;
+        z-index: 999;
+    }
+    
+    .three p {
+        font-family: Bio Sans;
+        font-size: 16px;
+        text-align: center;
+        color: #ffffff;
+    }
+    
+    .footer {
+        position: fixed;
+        width: 300px;
+        left: 0;
+        right: 0;
+        bottom: 10px;
+        height: 20px;
+        line-height: 20px;
+        background-color: #fff;
+        text-align: center;
+        color: #31AEFF;
+        margin: 0 auto;
+        z-index: 999;
+    }
+    
     [v-cloak] {
         display: none;
     }
@@ -322,40 +240,35 @@
         <div class="toast" v-show="toastShow">
             {{toastText}}
         </div>
-        <div class="hang"><input placeholder="请输入主题" v-model="votes.Name" /></div>
-        <div class="hang">
-            <select v-model="votes.Type">
-            <option v-for="item in stateList" :value="item.value" :key="item.value" name="sendValue">{{
-                item.label }}
-            </option>
-            </select>
+        <div style="background: #ffffff;padding: 10px">
+            <div class="hang"><input :placeholder="curLangule['key2']" v-model="votes.Name" /></div>
+            <div class="hang"><input :placeholder="curLangule['key3']" v-model="votes.Desc" /></div>
+            <div class="hang2" v-for="(item,index) in xuanxiangArr">
+                <span class="right" />{{item.Name}}</span>
+                <span @click="del(index)" class="left"><img src="./images/jian.png"></span>
+            </div>
+            <div class="hang1">
+                <input :placeholder="curLangule['key4']" class="right" v-model="xuanxiangObj.Name" />
+                <span @click="add"><img src="./images/subtract.png"></span>
+            </div>
+            <div style="margin:10px 0px;text-align: center">
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
+            </div>
+            <div style="margin:10px 0px;text-align: center">
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
+            </div>
         </div>
-        <div class="hang"><input placeholder="请输入主题描述(可选)" /></div>
-        <div style="margin:10px 0px;text-align: center">
-            <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']"></date-picker>
-            <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']"></date-picker>
+        <div style="height:50px;"></div>
+        <div class="three">
+            <p @click="xiayibu">{{curLangule['key5']}}</p>
         </div>
-        <div style="margin:10px 0px;text-align: center">
-            <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']"></date-picker>
-            <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']"></date-picker>
+        <div class="footer" v-if="this.curTime!=''">
+            {{dateFormat(new Date(this.curTime), 'yyyy-MM-dd HH:mm')}}（{{curLangule['key8']}}：{{curblock}}）
         </div>
-        <!-- <div class="hang"><input placeholder="请输入活动开始的高度" v-model="votes['Starting-height']" /></div>
-        <div class="hang"><input placeholder="请输入活动结束的高度" v-model="votes['End-height']" /></div> -->
-        <div class="hang2" v-for="(item,index) in xuanxiangArr">
-            <span class="left">{{item.OptionID}}</span>
-            <span class="middle">{{item.Name}}</span>
-            <span class="right" @click="del(index)">删除</span>
-        </div>
-        <div class="hang1">
-            <input placeholder="选项标识" class="left" v-model="xuanxiangObj.OptionID" /><input placeholder="选项的内容" class="right" v-model="xuanxiangObj.Name" /><span @click="add">添加</span>
-        </div>
-
-        <div class="hang3">
-            <span @click="xiayibu">下一步</span>
-        </div>
+        <div style="height:30px;"></div>
     </div>
-
-
     </div>
 </body>
 <script>
@@ -363,35 +276,41 @@
         el: '#app',
         data: {
             zh: {
-                title: 'Elastos 多签钱包',
-                key: '开始日期',
-                key1: '结束日期'
+                title: '创建投票',
+                key: '开始时间',
+                key1: '结束时间',
+                key2: '输入主题',
+                key3: '输入更多信息',
+                key4: '添加选项',
+                key5: '创建',
+                key6: '选项不能重复',
+                key7: '开始时间需要小于结束时间',
+                key8: '当前区块',
+                key9: '结束时间不能早于当前时间'
             },
             en: {
-                title: 'Elastos Multi Sign Wallet',
-                key: '开始日期',
-                key1: '结束日期'
+                title: 'Create a voting',
+                key: 'Input start time',
+                key1: 'Input end  time',
+                key2: 'Input title',
+                key3: 'Input more details',
+                key4: 'Add option',
+                key5: 'Create',
+                key6: 'Option cannot be repeated',
+                key7: 'Start time needs to be less than end time',
+                key8: 'Current Block',
+                key9: 'End time cannot be earlier than current time'
             },
             curLangule: {},
             schemeConfig: {
-                "AppID": "f4d54cd97afa828a9705e38eb679fad564cf3adf4cecd1a5503498155969b07baaa4c4a016084c0f21e06c59e76c33929925052d7d0ae3cfc679a0fdf48ec23f",
-                "AppName": encodeURIComponent("ELA Multi-sig Wallet"),
-                "DID": "ipFFpL1JwPRQKfhmxak8r1wWEbdkJ3rXZu",
-                "PublicKey": "035731ff69f8cfdcd9881e573143d71de2390b2e8e71fa14729e6b506f5d74939d",
-                "RandomNumber": "123456789",
-                "ReturnUrl": "",
-                "RequestInfo": "Nickname"
-            },
-            schemeConfig1: {
-                "AppID": "f4d54cd97afa828a9705e38eb679fad564cf3adf4cecd1a5503498155969b07baaa4c4a016084c0f21e06c59e76c33929925052d7d0ae3cfc679a0fdf48ec23f",
-                "AppName": encodeURIComponent("ELA Multi-sig Wallet"),
-                "DID": "ipFFpL1JwPRQKfhmxak8r1wWEbdkJ3rXZu",
-                "PublicKey": "035731ff69f8cfdcd9881e573143d71de2390b2e8e71fa14729e6b506f5d74939d",
+                "AppID": "3461ba97b110118ed25a66697e021004e3de05a52c05bb10470619d73d3932a59c59e81a6f6621f22dfc9b0182df5891d13bd2afcb86cb8665d02e608f03b3cf",
+                "AppName": encodeURIComponent("Vote For Me"),
+                "DID": "ibxNTG1hBPK1rZuoc8fMy4eFQ96UYDAQ4J",
+                "PublicKey": "034c51ddc0844ff11397cc773a5b7d94d5eed05e7006fb229cf965b47f19d27c55",
                 "RequestedContent": "",
                 "UseStatement": "didvote",
                 "ReturnUrl": "",
             },
-            showMask: false,
             toastText: "",
             toastShow: false,
             xuanxiangArr: [],
@@ -400,15 +319,8 @@
                 Name: "",
                 Desc: ""
             },
-            stateList: [{
-                value: 'singleChoice',
-                label: '单选题'
-            }, {
-                value: 'multipleChoice',
-                label: '多选题'
-            }],
             votes: {
-                Name: "您认为早餐重要吗？",
+                Name: "",
                 Desc: "",
                 Type: "singleChoice",
                 "Max-Selections": "",
@@ -418,9 +330,68 @@
             },
             startTime: new Date(),
             endTime: new Date(),
-            curLanguleKey: ""
+            curLanguleKey: "",
+            curblock: '',
+            curTime: '',
         },
         methods: {
+            dateFormat(date, sFormat) {
+                let time = {
+                    Year: 0,
+                    TYear: '0',
+                    Month: 0,
+                    TMonth: '0',
+                    Day: 0,
+                    TDay: '0',
+                    Hour: 0,
+                    THour: '0',
+                    hour: 0,
+                    Thour: '0',
+                    Minute: 0,
+                    TMinute: '0',
+                    Second: 0,
+                    TSecond: '0',
+                    Millisecond: 0
+                };
+                time.Year = date.getFullYear();
+                time.TYear = String(time.Year).substr(2);
+                time.Month = date.getMonth() + 1;
+                time.TMonth = time.Month < 10 ? "0" + time.Month : String(time.Month);
+                time.Day = date.getDate();
+                time.TDay = time.Day < 10 ? "0" + time.Day : String(time.Day);
+                time.Hour = date.getHours();
+                time.THour = time.Hour < 10 ? "0" + time.Hour : String(time.Hour);
+                time.hour = time.Hour < 13 ? time.Hour : time.Hour - 12;
+                time.Thour = time.hour < 10 ? "0" + time.hour : String(time.hour);
+                time.Minute = date.getMinutes();
+                time.TMinute = time.Minute < 10 ? "0" + time.Minute : String(time.Minute);
+                time.Second = date.getSeconds();
+                time.TSecond = time.Second < 10 ? "0" + time.Second : String(time.Second);
+                time.Millisecond = date.getMilliseconds();
+
+                return sFormat.replace(/yyyy/ig, String(time.Year))
+                    .replace(/yyy/ig, String(time.Year))
+                    .replace(/yy/ig, time.TYear)
+                    .replace(/y/ig, time.TYear)
+                    .replace(/MM/g, time.TMonth)
+                    .replace(/M/g, String(time.Month))
+                    .replace(/dd/ig, time.TDay)
+                    .replace(/d/ig, String(time.Day))
+                    .replace(/HH/g, time.THour)
+                    .replace(/H/g, String(time.Hour))
+                    .replace(/hh/g, time.Thour)
+                    .replace(/h/g, String(time.hour))
+                    .replace(/mm/g, time.TMinute)
+                    .replace(/m/g, String(time.Minute))
+                    .replace(/ss/ig, time.TSecond)
+                    .replace(/s/ig, String(time.Second))
+                    .replace(/fff/ig, String(time.Millisecond))
+            },
+            getUrl() {
+                //获取主机地址
+                var localhostPaht = window.location.protocol + "//" + window.location.host;
+                return localhostPaht;
+            },
             getUrlParam: function(name) {
                 //正则表达式过滤
                 var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)", "i");
@@ -446,10 +417,34 @@
                 });
             },
             xiayibu() {
+
+                if (this.votes['Name'] === '') {
+                    this.toast(this.curLangule['key2']);
+                    return;
+                }
+                if (this.xuanxiangArr.length <= 1) {
+                    this.toast(this.curLangule['key4']);
+                    return;
+                }
+
+                if (this.startTime === null) {
+                    this.toast(this.curLangule['key']);
+                    return;
+                }
+
+                if (this.endTime === null) {
+                    this.toast(this.curLangule['key1']);
+                    return;
+                }
                 this.votes["Starting-height-alias"] = parseInt((new Date(this.startTime).getTime() / 1000));
                 this.votes["End-height-alias"] = parseInt((new Date(this.endTime).getTime() / 1000));
                 if (this.votes["Starting-height-alias"] > this.votes["End-height-alias"]) {
-                    this.toast("开始时间需要小于结束时间");
+                    this.toast(this.curLangule['key7']);
+                    return;
+                }
+
+                if (this.votes["End-height-alias"] < parseInt((new Date().getTime() / 1000))) {
+                    this.toast(this.curLangule['key9']);
                     return;
                 }
                 this.votes["Starting-height"] = this.getBHeight(this.votes["Starting-height-alias"]);
@@ -459,17 +454,23 @@
                 var objStr = JSON.stringify(this.votes);
                 console.log(JSON.stringify(this.votes));
                 var url = this.buildSign(objStr);
-                var turl = 'https://launch.elaphant.app?appName=ELA Multi-sig Wallet&autoRedirect=True&appTitle=ELA Multi-sig Wallet&redirectURL=' + encodeURIComponent(url);
+                var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
                 location.href = turl;
             },
             getBHeight(curTime) {
-                return this.votes["Starting-height"] + (curTime - this.votes["Starting-height-alias"]) / 180;
+                var cur = parseInt(this.curTime / 1000);
+                var height = this.curblock + (curTime - cur) / 180;
+                return parseInt(height);
             },
             buildSign(objStr) {
-                this.schemeConfig1['RequestedContent'] = objStr;
-                this.schemeConfig1['ReturnUrl'] = 'http://dev1.elapps.net/previewVote.html';
+                this.schemeConfig['RequestedContent'] = objStr;
+                var baseUrl = this.getUrl();
+                if (baseUrl === "file://") {
+                    baseUrl = 'http://dev1.elapps.net';
+                }
+                this.schemeConfig['ReturnUrl'] = baseUrl + '/createResult.html';
                 var url = "elaphant://sign?";
-                _.forEach(this.schemeConfig1, function(val, key, index) {
+                _.forEach(this.schemeConfig, function(val, key, index) {
                     if (key === 'ReturnUrl' || key === 'RequestInfo' || key === 'RequestedContent') {
                         val = encodeURIComponent(val);
                     }
@@ -478,9 +479,6 @@
 
                 return url.substring(0, url.length - 1);
             },
-            getLen2(str) {　　　　 //将中文替换成两个英文字符来统计
-                return str.replace(/[^\x00-\xff]/g, "aa").length;
-            },
             toast(str) {
                 var v = this;
                 v.toastText = str
@@ -488,18 +486,6 @@
                 setTimeout(function() {
                     v.toastShow = false;
                 }, 1500)
-            },
-            buildIdentity() {
-                this.schemeConfig['ReturnUrl'] = 'http://dev1.elapps.net/createWallet.html';
-                var url = "elaphant://identity?";
-                _.forEach(this.schemeConfig, function(val, key, index) {
-                    if (key === 'ReturnUrl' || key === 'RequestInfo') {
-                        val = encodeURIComponent(val);
-                    }
-                    url += key + '=' + val + '&';
-                });
-
-                return url.substring(0, url.length - 1);
             },
             getLanugle: function() {
                 this.curLangule = this.en;
@@ -518,34 +504,62 @@
                     this.curLanguleKey = 'en';
                 }
             },
-            create() {
-                var url = this.buildIdentity();
-                var turl = 'https://launch.elaphant.app?appName=ELA Multi-sig Wallet&autoRedirect=True&appTitle=ELA Multi-sig Wallet&redirectURL=' + encodeURIComponent(url);
-                location.href = turl;
-                //location.href = './createWallet.html';
+            getNumber() {
+                var arr = _.cloneDeep(this.xuanxiangArr);
+                arr = _.sortBy(arr, function(item) {
+                    return -item["OptionID"];
+                });
+
+                var num = 1;
+
+                if (arr.length > 0) {
+                    num = arr[0]["OptionID"] + 1;
+                }
+
+                return num;
+            },
+            isExit(arr, name) {
+                for (var index = 0; index < arr.length; index++) {
+                    var item = arr[index];
+                    var iname = item['Name'];
+                    if (name === iname) {
+                        return true;
+                    }
+                }
+
+                return false;
             },
             add() {
-                if (this.xuanxiangObj.OptionID == "") {
-                    this.toast("请输入题号");
-                    return false;
-                }
+                this.xuanxiangObj.OptionID = this.getNumber();
                 if (this.xuanxiangObj.Name == "") {
-                    this.toast("请输入题型内容");
+                    this.toast(this.curLangule['key4']);
                     return false;
                 }
-                this.xuanxiangObj.OptionID = parseInt(this.xuanxiangObj.OptionID);
+
+                if (this.isExit(this.xuanxiangArr, this.xuanxiangObj.Name)) {
+                    this.toast(this.curLangule['key6']);
+                    return false;
+                }
+
                 var item = _.cloneDeep(this.xuanxiangObj);
                 this.xuanxiangArr.push(item);
+                this.xuanxiangObj = {
+                    OptionID: "",
+                    Name: "",
+                    Desc: ""
+                };
+
             },
             del(index) {
                 this.xuanxiangArr.splice(index, 1);
             }
         },
         created: function() {
-
+            this.votes['Type'] = this.getUrlParam('voteType') || 'singleChoice';
             this.xuanxiangArr = this.votes.Options;
             this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
-                console.log("res===" + JSON.stringify(res));
+                this.curblock = res[0].height;
+                this.curTime = new Date().getTime();
                 this.votes["Starting-height"] = res[0].height;
                 this.startTime = new Date();
                 this.endTime = new Date(new Date().getTime() + 1000 * 60 * 60 * 6);
