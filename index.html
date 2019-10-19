@@ -767,6 +767,8 @@
             },
             handleDate(list) {
                 var arr = [];
+                var endArr = []; //结束的数组
+                var allArr = []; //所有元素
                 for (var index = 0; index < list.length; index++) {
                     var item = list[index];
                     var key = item["property_key"];
@@ -780,17 +782,25 @@
                             var requestedConent = sitem["RequestedConent"] || sitem["RequestedContent"];
                             sitem["RequestedConent"] = JSON.parse(requestedConent);
                             if (sitem["RequestedConent"]["Name"] && sitem["RequestedConent"]["Starting-height-alias"]) {
-                                arr.push(sitem);
+                                if (sitem['RequestedConent']['End-height-alias'] <= this.curTime) {
+                                    endArr.push(sitem);
+                                } else {
+                                    arr.push(sitem);
+                                }
                             }
 
 
                         }
                     }
                 }
-                arr = _.sortBy(arr, function(item) {
+
+                var arr = _.sortBy(arr, function(item) {
                     return -item["block_time"];
                 });
-                return arr;
+
+                allArr = arr.concat(endArr);
+
+                return allArr;
             },
             handleDate1() {
                 var hashList = localStorage.getItem('did-vote-sendTx-hashList') || "";
