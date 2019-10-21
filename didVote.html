@@ -448,7 +448,8 @@
                 </div>
 
                 <div class="option" :class="{'back':selectObj[item.OptionID]}">
-                    {{item.Name}}
+                    <span v-if="item.Desc===''">{{item.Name}}</span>
+                    <span v-if="item.Desc!=''" @click="clickUrl(item.Desc)" style="color: #31AEFF;cursor: pointer;text-decoration: underline;">{{item.Name}}</span>
                 </div>
 
                 <div class="voteNum" @click="chakan(item)">
@@ -465,7 +466,8 @@
                 </div>
 
                 <div class="option" :class="{'back':selectObj[item.OptionID]}">
-                    {{item.Name}}
+                    <span v-if="item.Desc===''">{{item.Name}}</span>
+                    <span v-if="item.Desc!=''" @click="clickUrl(item.Desc)" style="color: #31AEFF;cursor: pointer;text-decoration: underline;">{{item.Name}}</span>
                 </div>
 
                 <div class="voteNum" @click="chakan(item)">
@@ -569,6 +571,14 @@
             toastShow: false,
         },
         methods: {
+            clickUrl(url) {
+                if (url.substr(0, 7).toLowerCase() == "http://" || url.substr(0, 8).toLowerCase() == "https://") {
+                    url = url;
+                } else {
+                    url = "http://" + url;
+                }
+                window.open(url);
+            },
             init() {
                 var hash = this.getUrlParam("hashStr");
                 this.propertyKey = 'did-voting/' + hash + '/topic_object';

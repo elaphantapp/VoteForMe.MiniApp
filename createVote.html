@@ -131,9 +131,12 @@
     }
     
     .hang2 .left {
-        display: inline-block;
-        width: 30px;
-        vertical-align: top;
+        /* display: inline-block;
+        width: 30px; */
+        /* vertical-align: top; */
+        position: absolute;
+        right: 0px;
+        top: 0px;
     }
     
     .hang2 .right {
@@ -244,11 +247,15 @@
             <div class="hang"><input :placeholder="curLangule['key2']" v-model="votes.Name" /></div>
             <div class="hang"><input :placeholder="curLangule['key3']" v-model="votes.Desc" /></div>
             <div class="hang2" v-for="(item,index) in xuanxiangArr">
-                <span class="right" />{{item.Name}}</span>
-                <span @click="del(index)" class="left"><img src="./images/jian.png"></span>
+                <p style="text-align: left;width: 295px;margin: 0 auto;height:30px;word-wrap:break-word;overflow:auto;padding-left:10px">{{item.Name}}</p>
+                <p style="text-align: left;width: 295px;margin: 0 auto;;height:30px;border-bottom: 1px solid #EBEBEB;position:relative;padding-left:10px">{{item.Desc}} <span @click="del(index)" class="left"><img src="./images/jian.png"></span></p>
             </div>
             <div class="hang1">
-                <input :placeholder="curLangule['key4']" class="right" v-model="xuanxiangObj.Name" />
+                <input :placeholder="curLangule['key4']" class="right" v-model="xuanxiangObj.Name" style="width:265px;" />
+                <span style="display:inline-block;width:31px">&nbsp;</span>
+            </div>
+            <div class="hang1">
+                <input :placeholder="curLangule['key10']" class="right" v-model="xuanxiangObj.Desc" />
                 <span @click="add"><img src="./images/subtract.png"></span>
             </div>
             <div style="margin:10px 0px;text-align: center">
@@ -280,26 +287,30 @@
                 key: '开始时间',
                 key1: '结束时间',
                 key2: '输入主题',
-                key3: '输入更多信息',
+                key3: '输入更多信息（可选）',
                 key4: '添加选项',
                 key5: '创建',
                 key6: '选项不能重复',
                 key7: '开始时间需要小于结束时间',
                 key8: '当前区块',
-                key9: '结束时间不能早于当前时间'
+                key9: '结束时间不能早于当前时间',
+                key10: '输入URL（可选）',
+                key11: 'url格式不正确'
             },
             en: {
                 title: 'Create a voting',
                 key: 'Input start time',
                 key1: 'Input end  time',
                 key2: 'Input title',
-                key3: 'Input more details',
+                key3: 'Input more details (optional)',
                 key4: 'Add option',
                 key5: 'Create',
                 key6: 'Option cannot be repeated',
                 key7: 'Start time needs to be less than end time',
                 key8: 'Current Block',
-                key9: 'End time cannot be earlier than current time'
+                key9: 'End time cannot be earlier than current time',
+                key10: 'Input URL (optional)',
+                key11: 'Incorrect URL format'
             },
             curLangule: {},
             schemeConfig: {
@@ -335,6 +346,15 @@
             curTime: '',
         },
         methods: {
+            isUrl(str) {
+                var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
+                var objExp = new RegExp(Expression);
+                if (objExp.test(str) == true) {
+                    return true;
+                } else {
+                    return false;
+                }
+            },
             dateFormat(date, sFormat) {
                 let time = {
                     Year: 0,
@@ -538,6 +558,11 @@
 
                 if (this.isExit(this.xuanxiangArr, this.xuanxiangObj.Name)) {
                     this.toast(this.curLangule['key6']);
+                    return false;
+                }
+
+                if (this.xuanxiangObj.Desc != '' && !this.isUrl(this.xuanxiangObj.Desc)) {
+                    this.toast(this.curLangule['key11']);
                     return false;
                 }
 
