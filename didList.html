@@ -24,6 +24,21 @@
     [v-cloak] {
         display: none;
     }
+    
+    .footer {
+        position: fixed;
+        width: 300px;
+        left: 0;
+        right: 0;
+        bottom: 10px;
+        height: 20px;
+        line-height: 20px;
+        background-color: #fff;
+        text-align: center;
+        color: #31AEFF;
+        margin: 0 auto;
+        z-index: 999;
+    }
 </style>
 
 <body>
@@ -31,6 +46,10 @@
         <div style="margin-top: 20px;text-align:left;padding:0px 10px" v-for="(item,index) in didList">
             {{item["did"]}}
             <p style="text-align: left;margin-top:5px"> {{handleTime(item)}}</p>
+        </div>
+
+        <div class="footer" v-if="this.curTime!=''">
+            <!-- {{dateFormat(new Date(this.curTime*1000), 'yyyy-MM-dd HH:mm')}}-->{{curLangule['key9']}}：{{curblock}}
         </div>
     </div>
 
@@ -41,15 +60,40 @@
         data: {
             zh: {
                 title: '投票',
+                key9: '当前区块',
             },
             en: {
                 title: 'Voting',
+                key9: 'Current Block',
             },
             curLangule: {},
             txId: "",
-            didList: []
+            didList: [],
+            curblock: '',
+            curTime: ''
         },
         methods: {
+            getAjax(url) {
+                return new Promise((resovle, reject) => {
+                    $.ajax({
+                        url: url,
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function(data) { //成功回调函数
+                            resovle(data);
+                        },
+                        error: function(err) { //失败回调函数
+                            reject(err);
+                        }
+                    });
+                });
+            },
+            getAjaxHeight() {
+                this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
+                    this.curblock = res[0].height;
+                    this.curTime = new Date().getTime();
+                })
+            },
             handleTime(item) {
                 var str = String(item["createTime"]);
                 var timeStr = "";
@@ -145,6 +189,7 @@
             },
         },
         created: function() {
+            this.getAjaxHeight();
             var dataStr = decodeURIComponent(this.getUrlParam("didList"));
             this.didList = JSON.parse(dataStr);
             this.didList = _.sortBy(this.didList, function(item) {

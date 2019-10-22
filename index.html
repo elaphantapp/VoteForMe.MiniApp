@@ -783,9 +783,14 @@
                             sitem["RequestedConent"] = JSON.parse(requestedConent);
                             if (sitem["RequestedConent"]["Name"] && sitem["RequestedConent"]["Starting-height-alias"]) {
                                 if (sitem['RequestedConent']['End-height-alias'] <= this.curTime) {
-                                    endArr.push(sitem);
+                                    if (item["block_time"] >= parseInt(new Date("2019-10-22 00:00").getTime() / 1000)) {
+                                        endArr.push(sitem);
+                                    }
                                 } else {
-                                    arr.push(sitem);
+                                    if (item["block_time"] >= parseInt(new Date("2019-10-22 00:00").getTime() / 1000)) {
+                                        arr.push(sitem);
+                                    }
+
                                 }
                             }
 
