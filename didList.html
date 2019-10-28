@@ -47,7 +47,7 @@
             {{item["did"]}}
             <p style="text-align: left;margin-top:5px"> {{handleTime(item)}}</p>
         </div>
-
+        <div style="height:50px"></div>
         <div class="footer" v-if="this.curTime!=''">
             <!-- {{dateFormat(new Date(this.curTime*1000), 'yyyy-MM-dd HH:mm')}}-->{{curLangule['key9']}}：{{curblock}}
         </div>
@@ -191,8 +191,8 @@
         created: function() {
             this.getAjaxHeight();
             var dataStr = decodeURIComponent(this.getUrlParam("didList"));
-            this.didList = JSON.parse(dataStr);
-            this.didList = _.sortBy(this.didList, function(item) {
+            var didListStr = localStorage.getItem('did-list-key') || '[]';
+            this.didList = _.sortBy(JSON.parse(didListStr), function(item) {
                 return -item["createTime"];
             });
         },

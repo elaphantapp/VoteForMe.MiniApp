@@ -729,12 +729,12 @@
                 var topicId = this.propertyKey.split('/')[1];
                 var key = topicId + '-' + item["OptionID"];
                 var obj = this.didVoteObj[key]["didList"];
-                var str = encodeURIComponent(JSON.stringify(obj));
                 if (obj.length == 0) {
                     this.toast(this.curLangule['key14']);
                     return;
                 }
-                location.href = "./didList.html?didlist=" + str;
+                localStorage.setItem('did-list-key', JSON.stringify(obj));
+                location.href = "./didList.html";
             },
             handlNum(item) {
                 var topicId = this.propertyKey.split('/')[1];
