@@ -43,9 +43,11 @@
 
 <body>
     <div id="app" v-cloak>
-        <div style="margin-top: 20px;text-align:left;padding:0px 10px" v-for="(item,index) in didList">
+        <div style="margin-top: 20px;text-align:left;padding:0px 10px" v-for="(item,index) in didList" @click='clickItem(item)'>
             {{item["did"]}}
-            <p style="text-align: left;margin-top:5px"> {{handleTime(item)}}</p>
+            <p style="text-align: left;margin-top:5px"> {{handleTime(item)}}
+                <span style="color:#ff0000" v-if="!item['state']">{{curLangule['key10']}}</span>
+            </p>
         </div>
         <div style="height:50px"></div>
         <div class="footer" v-if="this.curTime!=''">
@@ -61,10 +63,12 @@
             zh: {
                 title: '投票',
                 key9: '当前区块',
+                key10: '无效'
             },
             en: {
                 title: 'Voting',
                 key9: 'Current Block',
+                key10: 'Invalid'
             },
             curLangule: {},
             txId: "",
@@ -106,8 +110,8 @@
                 return timeStr;
             },
             clickItem(item) {
-                var itemStr = JSON.stringify(item);
-                location.href = "./didVote.html?chainObj=" + encodeURIComponent(itemStr);
+                var did = item["did"];
+                window.open('https://idchain-test.elastos.org/did_detail/' + did);
             },
             getLanugle: function() {
                 this.curLangule = this.en;
@@ -192,9 +196,26 @@
             this.getAjaxHeight();
             var dataStr = decodeURIComponent(this.getUrlParam("didList"));
             var didListStr = localStorage.getItem('did-list-key') || '[]';
-            this.didList = _.sortBy(JSON.parse(didListStr), function(item) {
+            var sArr = _.filter(JSON.parse(didListStr),
+                function(o) {
+                    return o.state;
+                });
+
+            sArr = _.sortBy(sArr, function(item) {
                 return -item["createTime"];
             });
+
+
+            var fArr = _.filter(JSON.parse(didListStr),
+                function(o) {
+                    return !o.state;
+                });
+
+            fArr = _.sortBy(fArr, function(item) {
+                return -item["createTime"];
+            });
+
+            this.didList = sArr.concat(fArr);
         },
         mounted() {
             this.getLanugle();
