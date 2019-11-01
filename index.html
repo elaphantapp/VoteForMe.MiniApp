@@ -578,9 +578,9 @@
                         <div class="hang" v-for="(item,index) in didVoteArr" @click="clickItem(item)">
                             <div class="top">
                                 <span style="display:inline-block;width: 75%;overflow:auto;height:42px">{{item["RequestedConent"]["Name"]}}</span>
-                                <span style="position: absolute;right:30px;color:#ffac38" v-if="item['RequestedConent']['Starting-height-alias']>curTime">{{curLangule['key10']}}</span>
-                                <span style="position: absolute;right:30px;color:#99cc99" v-if="item['RequestedConent']['Starting-height-alias']<=curTime&&item['RequestedConent']['End-height-alias']>curTime">{{curLangule['key11']}}</span>
-                                <span style="position: absolute;right:30px;color:#ddd" v-if="item['RequestedConent']['End-height-alias']<=curTime">{{curLangule['key12']}}</span>
+                                <span style="position: absolute;right:30px;color:#ffac38" v-if="item['RequestedConent']['Starting-height']>curblock">{{curLangule['key10']}}</span>
+                                <span style="position: absolute;right:30px;color:#99cc99" v-if="item['RequestedConent']['Starting-height']<=curblock&&item['RequestedConent']['End-height']>curblock">{{curLangule['key11']}}</span>
+                                <span style="position: absolute;right:30px;color:#ddd" v-if="item['RequestedConent']['End-height']<=curblock">{{curLangule['key12']}}</span>
                             </div>
                             <div class="bottom">
                                 <div class="hang1">
@@ -782,7 +782,7 @@
                             var requestedConent = sitem["RequestedConent"] || sitem["RequestedContent"];
                             sitem["RequestedConent"] = JSON.parse(requestedConent);
                             if (sitem["RequestedConent"]["Name"] && sitem["RequestedConent"]["Starting-height-alias"]) {
-                                if (sitem['RequestedConent']['End-height-alias'] <= this.curTime) {
+                                if (sitem['RequestedConent']['End-height'] <= this.curblock) {
                                     if (item["block_time"] >= parseInt(new Date("2019/10/22 00:00").getTime() / 1000)) {
                                         endArr.push(sitem);
                                     }
