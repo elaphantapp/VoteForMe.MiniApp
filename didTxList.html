@@ -153,7 +153,7 @@
             {{toastText}}
         </div>
         <div class="spinner" v-if="loading">
-
+            {{voteList.length}}
             <div class="bounce1"></div>
 
             <div class="bounce2"></div>
@@ -330,8 +330,19 @@
 
                     var url = 'https://idchain.elastos.org/api/v1/block/properteis/did?did=' + this.chainDid;
                     this.getAjax(url).then((res) => {
-                        this.handleDate(res);
-                        setTimeout(() => {
+                        //this.handleDate(res);
+                        let rlen = res.length;
+                        let index = 0;
+                        let sid = setInterval(() => {
+                            if (index < rlen) {
+                                let item = res[index];
+                                this.handleDate(item);
+                                index++;
+                            } else {
+                                clearInterval(sid);
+                            }
+                        }, 100);
+                        setInterval(() => {
                             let allVotes = [];
                             let arr = Object.values(this.didVoteObj);
                             let len = arr.length;
@@ -362,9 +373,9 @@
                             this.flen = fArr.length;
 
                             this.voteList = sArr.concat(fArr);
-                            this.loading = false;
-
-                            //console.log("====" + JSON.stringify(this.voteList));
+                            if (this.voteList.length > 0) {
+                                this.loading = false;
+                            }
                         }, 1000);
                     }).catch((err) => {
                         console.log(JSON.stringify(err));
@@ -575,132 +586,59 @@
 
                 return false;
             },
-            addItem(selectObj, did, publicKey, cHeight, state, createTime) {
-                for (let index1 = 0; index1 < selectObj.length; index1++) {
-                    let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                    if (this.didVoteObj[key1]) {
-                        let didlist = this.didVoteObj[key1]["didList"] || [];
-                        if (this.isExit(didlist, did)) {
-                            return;
-                        }
-                        this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                        this.didVoteObj[key1]["didList"].push({
-                            "did": did,
-                            "sNo": selectObj[index1]["OptionID"],
-                            'address': this.$getAddress(publicKey),
-                            "bheight": cHeight,
-                            "state": state,
-                            "createTime": createTime
-                        });
-                    }
-                }
-            },
-            handleDate(list) {
-                let llen = list.length;
-                for (let index = 0; index < llen; index++) {
+            handleDate(it) {
 
-                    let item = list[index];
-                    let topicId = this.propertyKey.split('/')[1];
-                    let key = item["property_key"];
-                    let cHeight = item["height"];
-                    let createTime = item["block_time"];
+                let item = it;
+                let topicId = this.propertyKey.split('/')[1];
+                let key = item["property_key"];
+                let cHeight = item["height"];
+                let createTime = item["block_time"];
 
-                    //判断当前区块是否在 投票的时间区段
-                    let isRange = (cHeight >= this.chainObj["Starting-height"] && cHeight <= this.chainObj["End-height"]);
-                    if (isRange && key.indexOf("vote_object") > -1 && key.indexOf(topicId) > -1) {
-                        let valueItem = JSON.parse(item["property_value"]);
-                        let sign = valueItem["Signature"];
-                        let dataStr = decodeURIComponent(valueItem["DataStr"]);
-                        let publicKey = JSON.parse(dataStr)['PublicKey'];
-                        let verified = this.$verify(dataStr, sign, publicKey);
-                        let dataStrItem = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
-                        let rtItem = JSON.parse(dataStrItem);
-                        let selectObj = rtItem["Selections"];
-                        let slen = selectObj.length;
-                        let did = JSON.parse(dataStr)["DID"];
-                        let url = 'https://idchain-test.elastos.org/api/v2/block/properteis/did?did=' + did;
-                        setTimeout(() => {
-                            if (verified) {
-                                if (this.didPubs[did] == undefined) {
-                                    this.getAjax(url).then((res) => {
-                                        let pub = '';
-                                        if (res.length > 0) {
-                                            pub = res[0]["public_key"] || '';
-                                            if (pub != '' && pub === publicKey) {
-                                                for (let index1 = 0; index1 < slen; index1++) {
-                                                    let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                                    if (this.didVoteObj[key1]) {
-                                                        let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                        if (this.isExit(didlist, did)) {
-                                                            return;
-                                                        }
-                                                        this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
-                                                        this.didVoteObj[key1]["didList"].push({
-                                                            "did": did,
-                                                            "sNo": selectObj[index1]["OptionID"],
-                                                            'address': this.$getAddress(pub),
-                                                            "bheight": cHeight,
-                                                            "state": true,
-                                                            "createTime": createTime
-                                                        });
-                                                        this.didPubs[did] = pub;
-                                                        localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
-                                                    }
-
-                                                }
-                                            } else {
-                                                for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                                    let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                                    if (this.didVoteObj[key1]) {
-                                                        let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                        if (this.isExit(didlist, did)) {
-                                                            return;
-                                                        }
-                                                        this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                                                        this.didVoteObj[key1]["didList"].push({
-                                                            "did": did,
-                                                            "sNo": selectObj[index1]["OptionID"],
-                                                            'address': this.$getAddress(pub),
-                                                            "bheight": cHeight,
-                                                            "state": false,
-                                                            "createTime": createTime
-                                                        });
-
-                                                        this.didPubs[did] = pub;
-                                                        localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
-                                                    }
-                                                }
-                                                //this.addItem(selectObj, did, publicKey, cHeight, false, createTime);
+                //判断当前区块是否在 投票的时间区段
+                let isRange = (cHeight >= this.chainObj["Starting-height"] && cHeight <= this.chainObj["End-height"]);
+                if (isRange && key.indexOf("vote_object") > -1 && key.indexOf(topicId) > -1) {
+                    let valueItem = JSON.parse(item["property_value"]);
+                    let sign = valueItem["Signature"];
+                    let dataStr = decodeURIComponent(valueItem["DataStr"]);
+                    let publicKey = JSON.parse(dataStr)['PublicKey'];
+                    let verified = this.$verify(dataStr, sign, publicKey);
+                    let dataStrItem = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
+                    let rtItem = JSON.parse(dataStrItem);
+                    let selectObj = rtItem["Selections"];
+                    let slen = selectObj.length;
+                    let did = JSON.parse(dataStr)["DID"];
+                    let url = 'https://idchain-test.elastos.org/api/v2/block/properteis/did?did=' + did;
+                    if (verified) {
+                        if (this.didPubs[did] == undefined) {
+                            this.getAjax(url).then((res) => {
+                                let pub = '';
+                                if (res.length > 0) {
+                                    pub = res[0]["public_key"] || '';
+                                    if (pub != '' && pub === publicKey) {
+                                        //for (let index1 = 0; index1 < slen; index1++) {
+                                        let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                        if (this.didVoteObj[key1]) {
+                                            let didlist = this.didVoteObj[key1]["didList"] || [];
+                                            if (this.isExit(didlist, did)) {
+                                                return;
                                             }
-                                        } else {
-                                            for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                                let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                                if (this.didVoteObj[key1]) {
-                                                    let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                    if (this.isExit(didlist, did)) {
-                                                        return;
-                                                    }
-                                                    this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                                                    this.didVoteObj[key1]["didList"].push({
-                                                        "did": did,
-                                                        "sNo": selectObj[index1]["OptionID"],
-                                                        'address': '',
-                                                        "bheight": cHeight,
-                                                        "state": false,
-                                                        "createTime": createTime
-                                                    });
-                                                    this.didPubs[did] = "";
-                                                    localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
-                                                }
-                                            }
-                                            //this.addFItem(selectObj, did, publicKey, cHeight, false, createTime);
+                                            this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
+                                            this.didVoteObj[key1]["didList"].push({
+                                                "did": did,
+                                                "sNo": selectObj[0]["OptionID"],
+                                                'address': this.$getAddress(pub),
+                                                "bheight": cHeight,
+                                                "state": true,
+                                                "createTime": createTime
+                                            });
+                                            this.didPubs[did] = pub;
+                                            localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
                                         }
-                                    }).catch(() => {
-                                        this.loading = false;
-                                    });
-                                } else if (this.didPubs[did] === '') {
-                                    for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                        let key1 = topicId + "-" + selectObj[index1]["OptionID"];
+
+                                        //}
+                                    } else {
+                                        //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                        let key1 = topicId + "-" + selectObj[0]["OptionID"];
                                         if (this.didVoteObj[key1]) {
                                             let didlist = this.didVoteObj[key1]["didList"] || [];
                                             if (this.isExit(didlist, did)) {
@@ -709,136 +647,137 @@
                                             this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
                                             this.didVoteObj[key1]["didList"].push({
                                                 "did": did,
-                                                "sNo": selectObj[index1]["OptionID"],
-                                                'address': '',
+                                                "sNo": selectObj[0]["OptionID"],
+                                                'address': this.$getAddress(pub),
                                                 "bheight": cHeight,
                                                 "state": false,
                                                 "createTime": createTime
                                             });
+
+                                            this.didPubs[did] = pub;
+                                            localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
+                                            //}
                                         }
+                                        //this.addItem(selectObj, did, publicKey, cHeight, false, createTime);
                                     }
                                 } else {
-                                    let pub = this.didPubs[did];
-                                    if (pub != '' && pub === publicKey) {
-                                        for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                            let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                            if (this.didVoteObj[key1]) {
-                                                let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                if (this.isExit(didlist, did)) {
-                                                    return;
-                                                }
-                                                this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
-                                                this.didVoteObj[key1]["didList"].push({
-                                                    "did": did,
-                                                    "sNo": selectObj[index1]["OptionID"],
-                                                    'address': this.$getAddress(pub),
-                                                    "bheight": cHeight,
-                                                    "state": true,
-                                                    "createTime": createTime
-                                                });
-                                            }
+                                    //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                    let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                    if (this.didVoteObj[key1]) {
+                                        let didlist = this.didVoteObj[key1]["didList"] || [];
+                                        if (this.isExit(didlist, did)) {
+                                            return;
                                         }
-                                    } else {
-                                        for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                            let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                            if (this.didVoteObj[key1]) {
-                                                let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                if (this.isExit(didlist, did)) {
-                                                    return;
-                                                }
-                                                this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                                                this.didVoteObj[key1]["didList"].push({
-                                                    "did": did,
-                                                    "sNo": selectObj[index1]["OptionID"],
-                                                    'address': '',
-                                                    "bheight": cHeight,
-                                                    "state": false,
-                                                    "createTime": createTime
-                                                });
-                                            }
-                                        }
+                                        this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
+                                        this.didVoteObj[key1]["didList"].push({
+                                            "did": did,
+                                            "sNo": selectObj[0]["OptionID"],
+                                            'address': '',
+                                            "bheight": cHeight,
+                                            "state": false,
+                                            "createTime": createTime
+                                        });
+                                        this.didPubs[did] = "";
+                                        localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
                                     }
+                                    //}
+                                    //this.addFItem(selectObj, did, publicKey, cHeight, false, createTime);
+                                }
+                            }).catch(() => {
+                                this.loading = false;
+                            });
+                        } else if (this.didPubs[did] === '') {
+                            //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                            let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                            if (this.didVoteObj[key1]) {
+                                let didlist = this.didVoteObj[key1]["didList"] || [];
+                                if (this.isExit(didlist, did)) {
+                                    return;
+                                }
+                                this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
+                                this.didVoteObj[key1]["didList"].push({
+                                    "did": did,
+                                    "sNo": selectObj[0]["OptionID"],
+                                    'address': '',
+                                    "bheight": cHeight,
+                                    "state": false,
+                                    "createTime": createTime
+                                });
+                                //}
+                            }
+                        } else {
+                            let pub = this.didPubs[did];
+                            if (pub != '' && pub === publicKey) {
+                                //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                if (this.didVoteObj[key1]) {
+                                    let didlist = this.didVoteObj[key1]["didList"] || [];
+                                    if (this.isExit(didlist, did)) {
+                                        return;
+                                    }
+                                    this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
+                                    this.didVoteObj[key1]["didList"].push({
+                                        "did": did,
+                                        "sNo": selectObj[0]["OptionID"],
+                                        'address': this.$getAddress(pub),
+                                        "bheight": cHeight,
+                                        "state": true,
+                                        "createTime": createTime
+                                    });
+                                    //}
                                 }
                             } else {
-                                if (this.didPubs[did] == undefined) {
-                                    this.getAjax(url).then((res) => {
-                                        let pub = '';
-                                        if (res.length > 0) {
-                                            pub = res[0]["public_key"] || '';
-                                            if (pub != '' && pub === publicKey) {
-                                                for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                                    let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                                    if (this.didVoteObj[key1]) {
-                                                        let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                        if (this.isExit(didlist, did)) {
-                                                            return;
-                                                        }
-                                                        this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
-                                                        this.didVoteObj[key1]["didList"].push({
-                                                            "did": did,
-                                                            "sNo": selectObj[index1]["OptionID"],
-                                                            'address': this.$getAddress(pub),
-                                                            "bheight": cHeight,
-                                                            "state": true,
-                                                            "createTime": createTime
-                                                        });
-                                                        this.didPubs[did] = pub;
-                                                        localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
-                                                    }
-                                                }
-                                                //this.addItem(selectObj, did, publicKey, cHeight, true, createTime);
-                                            } else {
-                                                for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                                    let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                                    if (this.didVoteObj[key1]) {
-                                                        let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                        if (this.isExit(didlist, did)) {
-                                                            return;
-                                                        }
-                                                        this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                                                        this.didVoteObj[key1]["didList"].push({
-                                                            "did": did,
-                                                            "sNo": selectObj[index1]["OptionID"],
-                                                            'address': this.$getAddress(pub),
-                                                            "bheight": cHeight,
-                                                            "state": false,
-                                                            "createTime": createTime
-                                                        });
-                                                        this.didPubs[did] = pub;
-                                                        localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
-                                                    }
-                                                }
-                                                // this.addItem(selectObj, did, publicKey, cHeight, false, createTime);
-                                            }
-                                        } else {
-                                            for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                                let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                                if (this.didVoteObj[key1]) {
-                                                    let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                    if (this.isExit(didlist, did)) {
-                                                        return;
-                                                    }
-                                                    this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                                                    this.didVoteObj[key1]["didList"].push({
-                                                        "did": did,
-                                                        "sNo": selectObj[index1]["OptionID"],
-                                                        'address': '',
-                                                        "bheight": cHeight,
-                                                        "state": false,
-                                                        "createTime": createTime
-                                                    });
-                                                    this.didPubs[did] = '';
-                                                    localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
-                                                }
-                                            }
-                                            //this.addFItem(selectObj, did, publicKey, cHeight, false, createTime);
-                                        }
-                                    }).catch(() => {
-                                        this.loading = false;
+                                //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                if (this.didVoteObj[key1]) {
+                                    let didlist = this.didVoteObj[key1]["didList"] || [];
+                                    if (this.isExit(didlist, did)) {
+                                        return;
+                                    }
+                                    this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
+                                    this.didVoteObj[key1]["didList"].push({
+                                        "did": did,
+                                        "sNo": selectObj[0]["OptionID"],
+                                        'address': '',
+                                        "bheight": cHeight,
+                                        "state": false,
+                                        "createTime": createTime
                                     });
-                                } else if (this.didPubs[did] === '') {
-                                    for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                        let key1 = topicId + "-" + selectObj[index1]["OptionID"];
+                                }
+                                //}
+                            }
+                        }
+                    } else {
+                        if (this.didPubs[did] == undefined) {
+                            this.getAjax(url).then((res) => {
+                                let pub = '';
+                                if (res.length > 0) {
+                                    pub = res[0]["public_key"] || '';
+                                    if (pub != '' && pub === publicKey) {
+                                        //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                        let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                        if (this.didVoteObj[key1]) {
+                                            let didlist = this.didVoteObj[key1]["didList"] || [];
+                                            if (this.isExit(didlist, did)) {
+                                                return;
+                                            }
+                                            this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
+                                            this.didVoteObj[key1]["didList"].push({
+                                                "did": did,
+                                                "sNo": selectObj[0]["OptionID"],
+                                                'address': this.$getAddress(pub),
+                                                "bheight": cHeight,
+                                                "state": true,
+                                                "createTime": createTime
+                                            });
+                                            this.didPubs[did] = pub;
+                                            localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
+                                        }
+                                        //}
+                                        //this.addItem(selectObj, did, publicKey, cHeight, true, createTime);
+                                    } else {
+                                        //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                        let key1 = topicId + "-" + selectObj[0]["OptionID"];
                                         if (this.didVoteObj[key1]) {
                                             let didlist = this.didVoteObj[key1]["didList"] || [];
                                             if (this.isExit(didlist, did)) {
@@ -847,60 +786,108 @@
                                             this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
                                             this.didVoteObj[key1]["didList"].push({
                                                 "did": did,
-                                                "sNo": selectObj[index1]["OptionID"],
-                                                'address': '',
+                                                "sNo": selectObj[0]["OptionID"],
+                                                'address': this.$getAddress(pub),
                                                 "bheight": cHeight,
                                                 "state": false,
                                                 "createTime": createTime
                                             });
+                                            this.didPubs[did] = pub;
+                                            localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
                                         }
+                                        //}
+                                        // this.addItem(selectObj, did, publicKey, cHeight, false, createTime);
                                     }
                                 } else {
-                                    let pub = this.didPubs[did];
-                                    if (pub != '' && pub === publicKey) {
-                                        for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                            let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                            if (this.didVoteObj[key1]) {
-                                                let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                if (this.isExit(didlist, did)) {
-                                                    return;
-                                                }
-                                                this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
-                                                this.didVoteObj[key1]["didList"].push({
-                                                    "did": did,
-                                                    "sNo": selectObj[index1]["OptionID"],
-                                                    'address': this.$getAddress(pub),
-                                                    "bheight": cHeight,
-                                                    "state": true,
-                                                    "createTime": createTime
-                                                });
-                                            }
+                                    //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                    let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                    if (this.didVoteObj[key1]) {
+                                        let didlist = this.didVoteObj[key1]["didList"] || [];
+                                        if (this.isExit(didlist, did)) {
+                                            return;
                                         }
-                                    } else {
-                                        for (let index1 = 0; index1 < selectObj.length; index1++) {
-                                            let key1 = topicId + "-" + selectObj[index1]["OptionID"];
-                                            if (this.didVoteObj[key1]) {
-                                                let didlist = this.didVoteObj[key1]["didList"] || [];
-                                                if (this.isExit(didlist, did)) {
-                                                    return;
-                                                }
-                                                this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
-                                                this.didVoteObj[key1]["didList"].push({
-                                                    "did": did,
-                                                    "sNo": selectObj[index1]["OptionID"],
-                                                    'address': '',
-                                                    "bheight": cHeight,
-                                                    "state": false,
-                                                    "createTime": createTime
-                                                });
-                                            }
-                                        }
+                                        this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
+                                        this.didVoteObj[key1]["didList"].push({
+                                            "did": did,
+                                            "sNo": selectObj[0]["OptionID"],
+                                            'address': '',
+                                            "bheight": cHeight,
+                                            "state": false,
+                                            "createTime": createTime
+                                        });
+                                        this.didPubs[did] = '';
+                                        localStorage.setItem('didPubs', JSON.stringify(this.didPubs));
                                     }
+                                    //}
+                                    //this.addFItem(selectObj, did, publicKey, cHeight, false, createTime);
+                                }
+                            }).catch(() => {
+                                this.loading = false;
+                            });
+                        } else if (this.didPubs[did] === '') {
+                            //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                            let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                            if (this.didVoteObj[key1]) {
+                                let didlist = this.didVoteObj[key1]["didList"] || [];
+                                if (this.isExit(didlist, did)) {
+                                    return;
+                                }
+                                this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
+                                this.didVoteObj[key1]["didList"].push({
+                                    "did": did,
+                                    "sNo": selectObj[0]["OptionID"],
+                                    'address': '',
+                                    "bheight": cHeight,
+                                    "state": false,
+                                    "createTime": createTime
+                                });
+                                //}
+                            }
+                        } else {
+                            let pub = this.didPubs[did];
+                            if (pub != '' && pub === publicKey) {
+                                //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                if (this.didVoteObj[key1]) {
+                                    let didlist = this.didVoteObj[key1]["didList"] || [];
+                                    if (this.isExit(didlist, did)) {
+                                        return;
+                                    }
+                                    this.didVoteObj[key1]["votes"] = this.didVoteObj[key1]["votes"] + 1;
+                                    this.didVoteObj[key1]["didList"].push({
+                                        "did": did,
+                                        "sNo": selectObj[0]["OptionID"],
+                                        'address': this.$getAddress(pub),
+                                        "bheight": cHeight,
+                                        "state": true,
+                                        "createTime": createTime
+                                    });
+                                    //}
+                                }
+                            } else {
+                                //for (let index1 = 0; index1 < selectObj.length; index1++) {
+                                let key1 = topicId + "-" + selectObj[0]["OptionID"];
+                                if (this.didVoteObj[key1]) {
+                                    let didlist = this.didVoteObj[key1]["didList"] || [];
+                                    if (this.isExit(didlist, did)) {
+                                        return;
+                                    }
+                                    this.didVoteObj[key1]["Fvotes"] = this.didVoteObj[key1]["Fvotes"] + 1;
+                                    this.didVoteObj[key1]["didList"].push({
+                                        "did": did,
+                                        "sNo": selectObj[0]["OptionID"],
+                                        'address': '',
+                                        "bheight": cHeight,
+                                        "state": false,
+                                        "createTime": createTime
+                                    });
+                                    //}
                                 }
                             }
-                        }, 10);
+                        }
                     }
                 }
+                //}
             }
         },
         created: function() {
