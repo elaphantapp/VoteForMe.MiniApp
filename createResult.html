@@ -285,7 +285,7 @@
         },
         methods: {
             back() {
-                location.href = "./index.html";
+                location.href = "./voteIndex.html";
             },
             postAjax(url, parms) {
                 return new Promise((resovle, reject) => {
@@ -368,19 +368,11 @@
             }
         },
         created: function() {
+            this.DataStr = this.getUrlParam("Data");
+            this.sign = this.getUrlParam("Sign");
             var dataStr = decodeURIComponent(this.getUrlParam("Data"));
             var chainStr = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
-            this.DataStr = JSON.parse(dataStr);
-
-            var requestedConent = JSON.parse(dataStr)["RequestedConent"] || "";
-            if (requestedConent != "") {
-                this.DataStr["RequestedConent"] = JSON.parse(dataStr)["RequestedConent"];
-            } else {
-                this.DataStr["RequestedContent"] = JSON.parse(dataStr)["RequestedContent"];
-            }
-            this.DataStr = encodeURIComponent(JSON.stringify(this.DataStr));
             this.chainObj = JSON.parse(chainStr);
-            this.sign = this.getUrlParam("Sign");
             this.shanglian();
         },
         mounted() {
