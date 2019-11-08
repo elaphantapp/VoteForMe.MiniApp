@@ -194,7 +194,6 @@
         },
         created: function() {
             this.getAjaxHeight();
-            var dataStr = decodeURIComponent(this.getUrlParam("didList"));
             var didListStr = localStorage.getItem('did-list-key') || '[]';
             var sArr = _.filter(JSON.parse(didListStr),
                 function(o) {
