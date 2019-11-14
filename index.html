@@ -681,7 +681,7 @@
             getVoteDid() {
                 this.getAjax('https://api-voteforme.elaphant.net/api/1/didvoting/did').then((res) => {
                     var data = res.data;
-                    if (res['state'] === 200) {
+                    if (res['state'] === 0) {
                         this.chainDid = data['did'];
                         this.initTab();
                     }
@@ -759,7 +759,11 @@
             clickItem(item) {
                 if (this.tabIndex === 0) {
                     var hash = item["property_key"].split('/')[1];
-                    location.href = "./didVote.html?hashStr=" + hash;
+                    if (hash === "0e9c43aa69926650fa5215e5b011a87bd31c248f011e03d20c80d5bea1e92cb1") {
+                        location.href = "./didVote.html?hashStr=" + hash;
+                    } else {
+                        location.href = "./didVoteV2.html?hashStr=" + hash;
+                    }
                 } else {
                     window.open('https://idchain.elastos.org/txinfo/' + item['txHash']);
                 }

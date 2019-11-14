@@ -41,6 +41,21 @@
         cursor: pointer;
     }
     
+    .footer {
+        position: fixed;
+        width: 300px;
+        left: 0;
+        right: 0;
+        bottom: 10px;
+        height: 20px;
+        line-height: 20px;
+        background-color: #fff;
+        text-align: center;
+        color: #31AEFF;
+        margin: 0 auto;
+        z-index: 999;
+    }
+    
     [v-cloak] {
         display: none;
     }
@@ -49,12 +64,16 @@
 <body>
     <div id="app" v-cloak>
 
-        <div style="margin-top: 100px;font-size: 16px">
+        <div style="margin-left:5px;margin-right:5px;margin-top: 100px;font-size: 16px;">
             <div style="text-align: center;">{{curLangule['key']}}</div>
         </div>
 
         <div class="three">
             <p @click="back">{{curLangule['key1']}}</p>
+        </div>
+
+        <div class="footer" v-if="curblock!=''">
+            <!-- {{dateFormat(new Date(this.curTime*1000), 'yyyy-MM-dd HH:mm')}}-->{{curLangule['key2']}}：{{curblock}}
         </div>
     </div>
 
@@ -65,23 +84,48 @@
         data: {
             zh: {
                 title: '结果',
-                key: '交易已发送，2分钟后可以查看。',
-                key1: '返回主页'
+                key: '交易已发送，当下一个区块产生的时候就可以查看到。',
+                key1: '返回主页',
+                key2: '当前区块',
             },
             en: {
                 title: 'Result',
-                key: 'The transaction has been sent and can be viewed in 2 minutes.',
-                key1: 'Back Home'
+                key: 'The transaction has been sent. You can see it when the next block is generated.',
+                key1: 'Back Home',
+                key2: 'Current Block',
             },
             curLangule: {},
             txId: "",
             toastText: "",
             toastShow: false,
-            type: ''
+            type: '',
+            curblock: ''
         },
         methods: {
+            getAjax(url) {
+                return new Promise((resovle, reject) => {
+                    $.ajax({
+                        url: url,
+                        dataType: 'json',
+                        type: 'GET',
+                        success: function(data) { //成功回调函数
+                            resovle(data);
+                        },
+                        error: function(err) { //失败回调函数
+                            reject(err);
+                        }
+                    });
+                });
+            },
+            getAjaxHeight() {
+                this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
+                    this.curblock = res[0].height;
+                }).catch(() => {
+
+                });
+            },
             back() {
-                location.href = "./index.html";
+                location.href = "./voteIndex.html";
             },
             getLanugle: function() {
                 this.curLangule = this.en;
@@ -111,6 +155,7 @@
             }
         },
         created: function() {
+            this.getAjaxHeight();
             this.type = this.getUrlParam('type') || "";
             this.txId = this.getUrlParam('txId') || "";
             var hashList = localStorage.getItem('did-vote-sendTx-hashList') || "";

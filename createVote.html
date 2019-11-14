@@ -244,8 +244,20 @@
             {{toastText}}
         </div>
         <div style="background: #ffffff;padding: 10px">
-            <div class="hang"><input :placeholder="curLangule['key2']" v-model="votes.Name" /></div>
+            <div class="hang"><input :placeholder="curLangule['key2']" v-model="votes.Name" style="border-bottom: 1px solid #31AEFF;"></div>
             <div class="hang"><input :placeholder="curLangule['key3']" v-model="votes.Desc" /></div>
+            <div class="hang" v-if="this.votes['Type']==='multipleChoice'"><input :placeholder="curLangule['key12']" v-model="maxSelsect" /></div>
+            <div class="hang"><input :placeholder="curLangule['key13']" v-model="maxbalance" /></div>
+            <div style="margin:10px 0px;text-align: center">
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
+            </div>
+            <div style="margin:10px 0px;text-align: center">
+                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
+                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
+            </div>
+            <div style="height:5px;background-color:#F7F7F7;width:300px;margin: 0 auto;">
+            </div>
             <div class="hang2" v-for="(item,index) in xuanxiangArr">
                 <p style="text-align: left;width: 295px;margin: 0 auto;height:30px;word-wrap:break-word;overflow:auto;padding-left:10px">{{item.Name}}</p>
                 <p style="text-align: left;width: 295px;margin: 0 auto;;height:30px;border-bottom: 1px solid #EBEBEB;position:relative;padding-left:10px">{{item.Desc}} <span @click="del(index)" class="left"><img src="./images/jian.png"></span></p>
@@ -258,21 +270,13 @@
                 <input :placeholder="curLangule['key10']" class="right" v-model="xuanxiangObj.Desc" />
                 <span @click="add"><img src="./images/subtract.png"></span>
             </div>
-            <div style="margin:10px 0px;text-align: center">
-                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
-                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="startTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key']" :editable=false></date-picker>
-            </div>
-            <div style="margin:10px 0px;text-align: center">
-                <date-picker v-if="curLanguleKey==='zh'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="zh" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
-                <date-picker v-if="curLanguleKey==='en'" type="datetime" v-model="endTime" format="YYYY-MM-DD HH:mm:ss" lang="en" confirm :placeholder="curLangule['key1']" :editable=false></date-picker>
-            </div>
         </div>
         <div style="height:50px;"></div>
         <div class="three">
             <p @click="xiayibu">{{curLangule['key5']}}</p>
         </div>
         <div class="footer" v-if="this.curTime!=''">
-            {{curLangule['key8']}}：{{curblock}}
+            {{dateFormat(new Date(this.curTime), 'yyyy-MM-dd HH:mm')}}（{{curLangule['key8']}}：{{curblock}}）
         </div>
         <div style="height:30px;"></div>
     </div>
@@ -295,7 +299,11 @@
                 key8: '当前区块',
                 key9: '结束时间不能早于当前时间',
                 key10: '输入URL（可选）',
-                key11: 'url格式不正确'
+                key11: 'url格式不正确',
+                key12: '最大选择数',
+                key13: '投票钱包最少持有ELA数量',
+                key14: '输入的最大选项数不合法',
+                key15: '设置的最小数额不合法',
             },
             en: {
                 title: 'Create a voting',
@@ -310,7 +318,11 @@
                 key8: 'Current Block',
                 key9: 'End time cannot be earlier than current time',
                 key10: 'Input URL (optional)',
-                key11: 'Incorrect URL format'
+                key11: 'Incorrect URL format',
+                key12: 'Max-Selections',
+                key13: 'Minimum number of elas for Voting',
+                key14: 'The maximum number of options entered is illegal',
+                key15: 'The minimum amount set is illegal',
             },
             curLangule: {},
             schemeConfig: {
@@ -335,6 +347,7 @@
                 Desc: "",
                 Type: "singleChoice",
                 "Max-Selections": "",
+                "Limit-balance": "",
                 "Starting-height": "",
                 "End-height": "",
                 Options: []
@@ -344,6 +357,8 @@
             curLanguleKey: "",
             curblock: '',
             curTime: '',
+            maxSelsect: '',
+            maxbalance: '',
         },
         methods: {
             isUrl(str) {
@@ -470,9 +485,27 @@
                 this.votes["Starting-height"] = this.getBHeight(this.votes["Starting-height-alias"]);
                 this.votes["End-height"] = this.getBHeight(this.votes["End-height-alias"]);
                 this.votes.Options = _.cloneDeep(this.xuanxiangArr);
-                this.votes['Max-Selections'] = this.votes.Options.length;
+                let maxSelsect = "";
+                if (this.votes['Type'] === 'multipleChoice') {
+                    maxSelsect = this.maxSelsect || this.votes.Options.length;
+                } else {
+                    maxSelsect = this.maxSelsect || 1;
+                }
+
+                let r = /^\+?[1-9][0-9]*$/
+                if (!r.test(maxSelsect) || (maxSelsect > this.xuanxiangArr.length)) {　　　　　　
+                    this.toast(this.curLangule['key14']);　
+                    return;　　　　
+                }
+                this.votes['Max-Selections'] = parseInt(maxSelsect);
+                let r1 = /^\d+(\.{0,1}\d+){0,1}$/;
+                let maxbalance = this.maxbalance || 0;
+                if (!r1.test(maxbalance) || maxbalance < 0) {
+                    this.toast(this.curLangule['key15']);　
+                    return;　　
+                }
+                this.votes['Limit-balance'] = parseFloat(maxbalance);
                 var objStr = JSON.stringify(this.votes);
-                console.log(JSON.stringify(this.votes));
                 var url = this.buildSign(objStr);
                 var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
                 location.href = turl;

@@ -9,6 +9,11 @@
     <script src="./js/vue.min.js"></script>
     <script src="./js/jquery-3.2.1.min.js"></script>
     <script src="./js/lodash.min.js"></script>
+    <script src="./js/elastos-wallet-api-min.js"></script>
+    <script>
+        Vue.prototype.$verify = this.verify;
+        Vue.prototype.$getAddress = this.getAddress;
+    </script>
     <script>
         var sha256 = function sha256(ascii) {
             function rightRotate(value, amount) {
@@ -222,6 +227,27 @@
         border-radius: 200px;
     }
     
+    .toast {
+        position: fixed;
+        z-index: 2000;
+        left: 50%;
+        top: 25%;
+        transition: all .5s;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -ms-transform: translateX(-50%) translateY(-50%);
+        -o-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        text-align: center;
+        border-radius: 5px;
+        color: #FFF;
+        background: rgba(17, 17, 17, 0.7);
+        height: 45px;
+        line-height: 45px;
+        padding: 0 15px;
+        width: 100%;
+    }
+    
     [v-cloak] {
         display: none;
     }
@@ -241,7 +267,8 @@
             <div class="bounce3"></div>
         </div>
         <div style="margin-top: 30px;font-size: 16px;text-align: center">{{curLangule['key1']}}</div>
-        <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isFail">{{curLangule['key2']}}</div>
+        <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isVerified">{{curLangule['key5']}}</div>
+        <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isFail&&isVerified">{{curLangule['key2']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="isFail&&!loading">{{curLangule['key3']}}</div>
         <div class="four" v-if="isFail&&!loading">
             <span @click="back" class="left">
@@ -251,6 +278,15 @@
             <span @click="shanglian" class="right">
                 {{curLangule['key']}}
             </span>
+        </div>
+        <div class="four" v-if="!isVerified" style="text-align: center">
+            <span @click="back" class="left">
+                {{curLangule['key4']}}
+            </span>
+
+            <!-- <span @click="shanglian" class="right">
+                {{curLangule['key']}}
+            </span> -->
         </div>
     </div>
 </body>
@@ -264,7 +300,11 @@
                 key1: '已签名成功',
                 key2: '投票数据正在上链，请稍候。',
                 key3: '发送交易失败',
-                key4: '返回主页'
+                key4: '返回主页',
+                key5: '验签失败',
+                key6: '无效参数',
+                key7: '服务器异常，请稍后再试',
+                key8: '网络异常，请稍后再试'
             },
             en: {
                 title: 'Voting',
@@ -272,7 +312,11 @@
                 key1: 'Signed successfully',
                 key2: 'Voting data is being submitted to the blockchain, please wait.',
                 key3: 'Sending transaction failed',
-                key4: 'Back Home'
+                key4: 'Back Home',
+                key5: 'Verification failed',
+                key6: 'Invalid parameter',
+                key7: 'Server exception, please try again later.',
+                key8: 'Network exception, please try again later.'
             },
             curLangule: {},
             toastText: "",
@@ -282,10 +326,11 @@
             DataStr: "",
             loading: true,
             isFail: false,
+            isVerified: true,
         },
         methods: {
             back() {
-                location.href = "./index.html";
+                location.href = "./voteIndex.html";
             },
             postAjax(url, parms) {
                 return new Promise((resovle, reject) => {
@@ -319,8 +364,20 @@
 
                 this.postAjax(url, parms).then((res) => {
 
-                    if (res.state === 200) {
+                    if (res.state === 0) {
                         location.href = "./result.html?txId=" + res.data.txid + '&type=createVote';
+                    } else if (res.state === 10000) {
+                        this.loading = false;
+                        this.isFail = true;
+                        this.toast(curLangule['key7']);
+                    } else if (res.state === 10001) {
+                        this.loading = false;
+                        this.isFail = true;
+                        this.toast(curLangule['key8']);
+                    } else if (res.state === 10002) {
+                        this.loading = false;
+                        this.isFail = true;
+                        this.toast(curLangule['key6']);
                     } else {
                         this.loading = false;
                         this.isFail = true;
@@ -371,9 +428,17 @@
             this.DataStr = this.getUrlParam("Data");
             this.sign = this.getUrlParam("Sign");
             var dataStr = decodeURIComponent(this.getUrlParam("Data"));
-            var chainStr = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
-            this.chainObj = JSON.parse(chainStr);
-            this.shanglian();
+            let publicKey = JSON.parse(dataStr)['PublicKey'] || "";
+            let verified = this.$verify(dataStr, this.sign, publicKey);
+            if (verified) {
+                this.isVerified = true;
+                var chainStr = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
+                this.chainObj = JSON.parse(chainStr);
+                this.shanglian();
+            } else {
+                this.isVerified = false;
+                this.loading = false;
+            }
         },
         mounted() {
             this.getLanugle();

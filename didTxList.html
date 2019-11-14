@@ -387,7 +387,7 @@
             getVoteDid() {
                 this.getAjax('https://api-voteforme.elaphant.net/api/1/didvoting/did').then((res) => {
                     var data = res.data;
-                    if (res['state'] === 200) {
+                    if (res['state'] === 0) {
                         this.chainDid = data['did'];
                         this.init();
                     }
