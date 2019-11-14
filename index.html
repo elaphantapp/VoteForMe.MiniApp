@@ -759,7 +759,7 @@
             clickItem(item) {
                 if (this.tabIndex === 0) {
                     var hash = item["property_key"].split('/')[1];
-                    if (hash === "0e9c43aa69926650fa5215e5b011a87bd31c248f011e03d20c80d5bea1e92cb1") {
+                    if (hash === "0e9c43aa69926650fa5215e5b011a87bd31c248f011e03d20c80d5bea1e92cb1" || hash === '10d850b8aa4f45ae870f24a16cdc6f102503671b8dd2e296c0c69fd78e6e5be9') {
                         location.href = "./didVote.html?hashStr=" + hash;
                     } else {
                         location.href = "./didVoteV2.html?hashStr=" + hash;
