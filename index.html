@@ -776,7 +776,8 @@
                 for (var index = 0; index < list.length; index++) {
                     var item = list[index];
                     var key = item["property_key"];
-                    if (key.indexOf('topic_object') > -1) {
+                    if (key.indexOf('topic_object') > -1 && key.indexOf('7530a35b6c61317174c8966c06cb0ee2bfeb032baa1e47abeff292a722b88804') == -1) {
+
                         var str = JSON.parse(item["property_value"])["DataStr"] || "";
                         if (str != "") {
                             var sitem = JSON.parse(decodeURIComponent(str));
