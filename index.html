@@ -776,7 +776,10 @@
                 for (var index = 0; index < list.length; index++) {
                     var item = list[index];
                     var key = item["property_key"];
-                    if (key.indexOf('topic_object') > -1 && key.indexOf('7530a35b6c61317174c8966c06cb0ee2bfeb032baa1e47abeff292a722b88804') == -1) {
+                    if (key.indexOf('topic_object') > -1 && key.indexOf('7530a35b6c61317174c8966c06cb0ee2bfeb032baa1e47abeff292a722b88804') == -1 &&
+                        key.indexOf('10d850b8aa4f45ae870f24a16cdc6f102503671b8dd2e296c0c69fd78e6e5be9') == -1 &&
+                        key.indexOf('8333e8e5276e5b1e68a843bdce239219c7111bd0ebcdec7ae3b5230ecb86c95b') == -1 &&
+                        key.indexOf('3b9076f5d1887b1de0a287881164bfc53757a619d25456bfd47b680f20f87cb3') == -1) {
 
                         var str = JSON.parse(item["property_value"])["DataStr"] || "";
                         if (str != "") {
