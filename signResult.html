@@ -370,7 +370,17 @@
                 this.postAjax(url, parms).then((res) => {
                     if (res.state === 0) {
                         this.loading = false;
-                        location.href = "./result.html?txId=" + res.data.txid;
+                        let packet = res.data.packet || "";
+                        let amount = "";
+                        if (packet != "") {
+                            amount = packet.result.amount || "";
+                        }
+                        let hashid = "0e7e986d4d3d5569214f00139870d04fd79e9c2226b27e8ab02beb83a70d78b0";
+                        if (amount != "" && topicId === hashid) {
+                            location.href = "./result.html?txId=" + res.data.txid + '&amount=' + amount;
+                        } else {
+                            location.href = "./result.html?txId=" + res.data.txid;
+                        }
                     } else if (res.state === 10000) {
                         this.loading = false;
                         this.isFail = true;

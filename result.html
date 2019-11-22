@@ -68,6 +68,14 @@
             <div style="text-align: center;">{{curLangule['key']}}</div>
         </div>
 
+        <div style="margin-left:5px;margin-right:5px;margin-top: 10px;font-size: 16px;" v-if="amount">
+            <div style="text-align: center;">{{curLangule['key3']}} <span style="color:#ff0000">0.5 ELA</span> {{curLangule['key4']}}</div>
+        </div>
+
+        <div style="margin-left:5px;margin-right:5px;margin-top: 15px;font-size: 16px;" @click="redRecord()" v-if="amount">
+            <div style="text-align: center;color: #31AEFF;cursor: pointer;"><span style="border-bottom:#31AEFF 1px solid;padding:5px">{{curLangule['key5']}}</span></div>
+        </div>
+
         <div class="three">
             <p @click="back">{{curLangule['key1']}}</p>
         </div>
@@ -87,21 +95,31 @@
                 key: '交易已发送，当下一个区块产生的时候就可以查看到。',
                 key1: '返回主页',
                 key2: '当前区块',
+                key3: '恭喜你获得',
+                key4: '红包',
+                key5: '查看红包获取记录'
             },
             en: {
                 title: 'Result',
                 key: 'The transaction has been sent. You can see it when the next block is generated.',
                 key1: 'Back Home',
                 key2: 'Current Block',
+                key3: 'Congratulations on getting',
+                key4: 'redpacket',
+                key5: 'View the acquisition history of redpacket'
             },
             curLangule: {},
             txId: "",
             toastText: "",
             toastShow: false,
             type: '',
-            curblock: ''
+            curblock: '',
+            amount: "",
         },
         methods: {
+            redRecord() {
+                location.href = "./didTxList2.html";
+            },
             getAjax(url) {
                 return new Promise((resovle, reject) => {
                     $.ajax({
@@ -158,6 +176,7 @@
             this.getAjaxHeight();
             this.type = this.getUrlParam('type') || "";
             this.txId = this.getUrlParam('txId') || "";
+            this.amount = this.getUrlParam('amount') || "";
             var hashList = localStorage.getItem('did-vote-sendTx-hashList') || "";
             if (hashList === "") {
                 hashList = {};
