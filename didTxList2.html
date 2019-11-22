@@ -615,11 +615,8 @@
         created: function() {
             this.getAjax('https://redpacket.elastos.org/api/v1/packet/peek?packet_hash=3608154614618932&show_receivers=true').then(res => {
                 if (res.status === 200) {
-                    console.log("=========" + JSON.stringify(res['result']['packet_detail']["packet_rcver_details"]));
-                    let arr = res['result']['packet_detail']["packet_rcver_details"]
+                    let arr = res['result']['packet_detail']["packet_rcver_details"];
                     this.redpackObj = _.keyBy(arr, 'address');
-                    //this.redpackObj['EW2pc7x4Muuv4PXQyJQ8FHZUeEHZsbtwDc'] = 0.1;
-                    console.log("=========" + JSON.stringify(this.redpackObj));
                     this.getVoteDid();
                 }
 
