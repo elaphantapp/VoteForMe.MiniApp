@@ -373,7 +373,7 @@
                         let packet = res.data.packet || "";
                         let amount = "";
                         if (packet != "") {
-                            amount = packet.result.amount || "";
+                            amount = JSON.parse(packet).result.amount || "";
                         }
                         let hashid = "0e7e986d4d3d5569214f00139870d04fd79e9c2226b27e8ab02beb83a70d78b0";
                         if (amount != "" && topicId === hashid) {
