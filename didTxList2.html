@@ -229,7 +229,7 @@
                 </div>
             </div>
         </div>
-        <div style="height:30px"></div>
+        <div style="height:90px"></div>
         <div class="three">
             <p @click="back">{{curLangule['key16']}}</p>
         </div>
@@ -252,7 +252,7 @@
                 key9: '无效票数',
                 key10: '无效',
                 key15: '区块高度',
-                key16: '返回主页',
+                key16: '返回',
             },
             en: {
                 title: 'DID Voting',
@@ -267,7 +267,7 @@
                 key9: 'Invalid votes',
                 key10: 'Invalid',
                 key15: 'Block Height',
-                key16: 'Back Home',
+                key16: 'Back',
             },
             curLangule: {},
             toastText: "",
@@ -297,7 +297,8 @@
         },
         methods: {
             back() {
-                location.href = "./index.html";
+                //location.href = "./index.html";
+                window.history.go(-1);
             },
             handlenum(address) {
                 let addressObj = this.redpackObj[address] || "";
@@ -610,6 +611,10 @@
                     'address': this.$getAddress(publicKey),
                     "createTime": createTime
                 });
+
+                this.didVoteObj = _.sortBy(this.didVoteObj, function(item) {
+                    return item["createTime"];
+                });
             },
         },
         created: function() {
@@ -619,7 +624,6 @@
                     this.redpackObj = _.keyBy(arr, 'address');
                     this.getVoteDid();
                 }
-
             });
 
         },

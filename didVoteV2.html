@@ -326,7 +326,7 @@
         width: 220px;
         left: 0;
         right: 0;
-        bottom: 34px;
+        bottom: 53px;
         height: 44px;
         line-height: 44px;
         background: #31AEFF;
@@ -348,7 +348,7 @@
         margin: 0px auto;
         left: 0;
         right: 0;
-        bottom: 34px;
+        bottom: 53px;
         z-index: 999;
     }
     
@@ -471,6 +471,21 @@
         }
     }
     
+    .footer1 {
+        position: fixed;
+        width: 300px;
+        left: 0;
+        right: 0;
+        bottom: 30px;
+        height: 20px;
+        line-height: 20px;
+        background-color: #fff;
+        text-align: center;
+        color: #31AEFF;
+        margin: 0 auto;
+        z-index: 999;
+    }
+    
     [v-cloak] {
         display: none;
     }
@@ -561,8 +576,12 @@
                 <p>{{curLangule['key7']}}</p>
             </div>
 
-            <div class="footer" v-if="this.curTime!=''">
+            <div class="footer1" v-if="this.curTime!=''">
                 {{curLangule['key11']}}：{{curblock}}
+            </div>
+
+            <div class="footer" v-if="this.curTime!=''" @click="redRecord()">
+                <span style="border-bottom: #31AEFF 1px solid;cursor: pointer; ">{{curLangule['key20']}}</span>
             </div>
         </div>
     </div>
@@ -593,6 +612,7 @@
                 key17: '您最多可选 ',
                 key18: '选项',
                 key19: '投票钱包至少持有 ',
+                key20: '查看红包获取记录'
             },
             en: {
                 title: 'DID Voting',
@@ -616,6 +636,7 @@
                 key17: 'You can choose up to ',
                 key18: 'options',
                 key19: 'Voting wallet holds at least',
+                key20: 'View the acquisition history of redpacket'
             },
             curLangule: {},
             schemeConfig: {
@@ -651,6 +672,9 @@
             }
         },
         methods: {
+            redRecord() {
+                location.href = "./didTxList2.html?hashStr=" + this.propertyKey.split('/')[1];
+            },
             clickUrl(url) {
                 if (url.substr(0, 7).toLowerCase() == "http://" || url.substr(0, 8).toLowerCase() == "https://") {
                     url = url;
