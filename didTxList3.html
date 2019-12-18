@@ -724,6 +724,7 @@
                         let time = item['block_time'];
                         let dlen = res.length;
                         let pkey = res[0]['property_key'] || "";
+                        //let pkey = JSON.stringify(res);
                         if (pkey.indexOf('/Apps/8816ed501878a9f4404f5926c4fb2df56239424e41da9c449b4db35e9a8b99d5f976a0537858d709511b5b41cf11c0e88be8778008eb5f918a6aa712ac20c421/MiniPrograms') > -1) {
                             this.$set(this.didObj, did, true);
                         } else {
