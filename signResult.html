@@ -375,8 +375,9 @@
                         if (packet != "") {
                             amount = JSON.parse(packet).result.amount || "";
                         }
-                        let hashid = "0e7e986d4d3d5569214f00139870d04fd79e9c2226b27e8ab02beb83a70d78b0";
-                        if (amount != "" && topicId === hashid) {
+                        //let hashid = "0e7e986d4d3d5569214f00139870d04fd79e9c2226b27e8ab02beb83a70d78b0";
+                        //if (amount != "" && topicId === hashid) {
+                        if (amount != "") {
                             location.href = "./result.html?txId=" + res.data.txid + '&amount=' + amount;
                         } else {
                             location.href = "./result.html?txId=" + res.data.txid;

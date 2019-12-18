@@ -270,6 +270,14 @@
                 <input :placeholder="curLangule['key10']" class="right" v-model="xuanxiangObj.Desc" />
                 <span @click="add"><img src="./images/subtract.png"></span>
             </div>
+
+            <div class="hang1" @click="isShowRedPack" style="cursor: pointer;">
+                <input type="checkbox" style="width:20px;cursor: pointer;" v-model="isShow"><span style="text-align: left;display:inline-block;width:280px;">{{curLangule['key20']}}</span>
+            </div>
+            <div style="height:5px;background-color:#F7F7F7;width:300px;margin: 0 auto;" v-if="isShow">
+            </div>
+            <div class="hang" v-if="isShow"><input :placeholder="curLangule['key16']" v-model="createPacket.packet_amt" /></div>
+            <div class="hang" v-if="isShow"><input :placeholder="curLangule['key17']" v-model="createPacket.packet_num" /></div>
         </div>
         <div style="height:50px;"></div>
         <div class="three">
@@ -304,6 +312,12 @@
                 key13: '投票钱包最少持有ELA数量',
                 key14: '输入的最大选项数不合法',
                 key15: '设置的最小数额不合法',
+                key16: '输入红包金额',
+                key17: '输入红包数量',
+                key18: '红包金额不合法',
+                key19: '红包数量不合法',
+                key20: '创建红包',
+                key21: '红包金额不能少于1ELA',
             },
             en: {
                 title: 'Create a voting',
@@ -320,9 +334,15 @@
                 key10: 'Input URL (optional)',
                 key11: 'Incorrect URL format',
                 key12: 'Max-Selections',
-                key13: 'Minimum number of elas for Voting',
+                key13: 'Minimum number of ELA for Voting',
                 key14: 'The maximum number of options entered is illegal',
                 key15: 'The minimum amount set is illegal',
+                key16: 'Input the amount of red packet',
+                key17: 'Input the number of red packets',
+                key18: 'The amount of red packet is illegal',
+                key19: 'The number of red packets is illegal',
+                key20: 'Create red packet',
+                key21: 'The amount of red packet must not be less than 1 ELA',
             },
             curLangule: {},
             schemeConfig: {
@@ -359,8 +379,19 @@
             curTime: '',
             maxSelsect: '',
             maxbalance: '',
+            isShow: false,
+            createPacket: {
+                "packet_num": "",
+                "packet_amt": "",
+                "packet_type": 0,
+                "packet_creator": "Elaphant wallet",
+                "packet_end_timestamp": "",
+            }
         },
         methods: {
+            isShowRedPack() {
+                this.isShow = !this.isShow;
+            },
             isUrl(str) {
                 var Expression = /http(s)?:\/\/([\w-]+\.)+[\w-]+(\/[\w- .\/?%&=]*)?/;
                 var objExp = new RegExp(Expression);
@@ -482,6 +513,37 @@
                     this.toast(this.curLangule['key9']);
                     return;
                 }
+                if (this.isShow) {
+                    this.createPacket['packet_end_timestamp'] = this.votes["End-height-alias"] * 1000;
+                }
+                if (this.isShow && this.createPacket.packet_amt === "") {
+                    this.toast(this.curLangule['key16']);
+                    return false;
+                }
+
+                let r1 = /^\d+(\.{0,1}\d+){0,1}$/;
+                let packet_amt = this.createPacket.packet_amt;
+                if (this.isShow && !r1.test(packet_amt)) {
+                    this.toast(this.curLangule['key18']);
+                    return false;
+                }
+
+                if (this.isShow && parseFloat(packet_amt) < 1) {
+                    this.toast(this.curLangule['key21']);
+                    return false;
+                }
+
+                if (this.isShow && this.createPacket.packet_num === "") {
+                    this.toast(this.curLangule['key17']);
+                    return false;
+                }
+
+                let r2 = /^\+?[1-9][0-9]*$/;
+                let packet_num = this.createPacket.packet_num;
+                if (this.isShow && !r2.test(packet_num)) {
+                    this.toast(this.curLangule['key19']);
+                    return false;
+                }　
                 this.votes["Starting-height"] = this.getBHeight(this.votes["Starting-height-alias"]);
                 this.votes["End-height"] = this.getBHeight(this.votes["End-height-alias"]);
                 this.votes.Options = _.cloneDeep(this.xuanxiangArr);
@@ -492,13 +554,12 @@
                     maxSelsect = this.maxSelsect || 1;
                 }
 
-                let r = /^\+?[1-9][0-9]*$/
+                let r = /^\+?[1-9][0-9]*$/;
                 if (!r.test(maxSelsect) || (maxSelsect > this.xuanxiangArr.length)) {　　　　　　
                     this.toast(this.curLangule['key14']);　
                     return;　　　　
                 }
                 this.votes['Max-Selections'] = parseInt(maxSelsect);
-                let r1 = /^\d+(\.{0,1}\d+){0,1}$/;
                 let maxbalance = this.maxbalance || 0;
                 if (!r1.test(maxbalance) || maxbalance < 0) {
                     this.toast(this.curLangule['key15']);　
@@ -521,7 +582,12 @@
                 if (baseUrl === "file://") {
                     baseUrl = 'http://dev1.elapps.net';
                 }
-                this.schemeConfig['ReturnUrl'] = baseUrl + '/createResult.html';
+                if (this.isShow) {
+                    this.schemeConfig['ReturnUrl'] = baseUrl + '/createResult.html?createPacket=' + encodeURIComponent(JSON.stringify(this.createPacket));
+                } else {
+                    this.schemeConfig['ReturnUrl'] = baseUrl + '/createResult.html';
+                }
+
                 var url = "elaphant://sign?";
                 _.forEach(this.schemeConfig, function(val, key, index) {
                     if (key === 'ReturnUrl' || key === 'RequestInfo' || key === 'RequestedContent') {

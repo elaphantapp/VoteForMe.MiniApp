@@ -7,7 +7,13 @@
     <link rel="shortcut icon" href="./favicon.ico" type="image/x-icon">
     <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <script src="./js/vue.min.js"></script>
+    <script src="./js/vue-clipboard.min.js"></script>
     <script src="./js/jquery-3.2.1.min.js"></script>
+    <script src="./js/lodash.min.js"></script>
+    <script src="./js/vue-qrcode.min.js"></script>
+    <script>
+        Vue.component(VueQrcode.name, VueQrcode);
+    </script>
     <link rel="stylesheet" type="text/css" href="./css/reset.css">
     <link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
 </head>
@@ -56,6 +62,27 @@
         z-index: 999;
     }
     
+    .toast {
+        position: fixed;
+        z-index: 2000;
+        left: 50%;
+        top: 25%;
+        transition: all .5s;
+        -webkit-transform: translateX(-50%) translateY(-50%);
+        -moz-transform: translateX(-50%) translateY(-50%);
+        -ms-transform: translateX(-50%) translateY(-50%);
+        -o-transform: translateX(-50%) translateY(-50%);
+        transform: translateX(-50%) translateY(-50%);
+        text-align: center;
+        border-radius: 5px;
+        color: #FFF;
+        background: rgba(17, 17, 17, 0.7);
+        height: 45px;
+        line-height: 45px;
+        padding: 0 15px;
+        width: 100%;
+    }
+    
     [v-cloak] {
         display: none;
     }
@@ -64,17 +91,31 @@
 <body>
     <div id="app" v-cloak>
 
+        <div class="toast" v-show="toastShow">
+            {{toastText}}
+        </div>
+
         <div style="margin-left:5px;margin-right:5px;margin-top: 100px;font-size: 16px;">
             <div style="text-align: center;">{{curLangule['key']}}</div>
         </div>
 
-        <div style="margin-left:5px;margin-right:5px;margin-top: 10px;font-size: 16px;" v-if="amount">
-            <div style="text-align: center;">{{curLangule['key3']}} <span style="color:#ff0000">{{amount}} ELA</span> {{curLangule['key4']}}</div>
+        <div style="margin-left:5px;margin-right:5px;margin-top: 10px;font-size: 16px;" v-if="payAddress">
+            <div style="text-align:center;" @click="docopy(payAddress)">{{curLangule['key4']}}：{{payAddress}}</div>
+            <div style="margin: 0 auto;width: 150px;">
+                <qrcode :value="payAddress" :options="{ width:150 }" style="display:block"></qrcode>
+            </div>
+            <div style="text-align:center;">{{curLangule['key5']}}：{{payBanance}} ELA</div>
+
+            <div style="text-align: center;color:#31AEFF;margin-top: 15px;cursor: pointer;" @click="goCharge"><span style="border-bottom: 1px solid #31AEFF;padding-bottom: 3px;">{{curLangule["key8"]}}</span></div>
         </div>
 
-        <div style="margin-left:5px;margin-right:5px;margin-top: 15px;font-size: 16px;" @click="redRecord()" v-if="amount">
-            <div style="text-align: center;color: #31AEFF;cursor: pointer;"><span style="border-bottom:#31AEFF 1px solid;padding:5px">{{curLangule['key5']}}</span></div>
+        <div style="margin-left:5px;margin-right:5px;margin-top: 10px;font-size: 16px;" v-if="amount">
+            <div style="text-align: center;">{{curLangule['key6']}} <span style="color:#ff0000">{{amount}} ELA</span> {{curLangule['key7']}}</div>
         </div>
+
+        <!-- <div style="margin-left:5px;margin-right:5px;margin-top: 15px;font-size: 16px;" @click="redRecord()" v-if="amount">
+            <div style="text-align: center;color: #31AEFF;cursor: pointer;"><span style="border-bottom:#31AEFF 1px solid;padding:5px">{{curLangule['key8']}}</span></div>
+        </div> -->
 
         <div class="three">
             <p @click="back">{{curLangule['key1']}}</p>
@@ -95,18 +136,24 @@
                 key: '交易已发送，当下一个区块产生的时候就可以查看到。',
                 key1: '返回主页',
                 key2: '当前区块',
-                key3: '恭喜你获得',
-                key4: '红包',
-                key5: '查看红包获取记录'
+                key3: '复制成功',
+                key4: '充值地址',
+                key5: '充值金额',
+                key6: '恭喜你获得',
+                key7: '红包',
+                key8: '去充值'
             },
             en: {
                 title: 'Result',
                 key: 'The transaction has been sent. You can see it when the next block is generated.',
                 key1: 'Back Home',
                 key2: 'Current Block',
-                key3: 'Congratulations on getting',
-                key4: 'redpacket',
-                key5: 'View the acquisition history of redpacket'
+                key3: 'Copy Success',
+                key4: 'Recharge address',
+                key5: 'Recharge amount',
+                key6: 'Congratulations on getting',
+                key7: 'redpacket',
+                key8: 'To recharge'
             },
             curLangule: {},
             txId: "",
@@ -114,11 +161,63 @@
             toastShow: false,
             type: '',
             curblock: '',
+            payAddress: "",
+            payBanance: "",
+            schemeConfig: {
+                "AppID": "3461ba97b110118ed25a66697e021004e3de05a52c05bb10470619d73d3932a59c59e81a6f6621f22dfc9b0182df5891d13bd2afcb86cb8665d02e608f03b3cf",
+                "AppName": encodeURIComponent("Vote For Me"),
+                "DID": "ibxNTG1hBPK1rZuoc8fMy4eFQ96UYDAQ4J",
+                "PublicKey": "034c51ddc0844ff11397cc773a5b7d94d5eed05e7006fb229cf965b47f19d27c55",
+                "Description": "didvote",
+                "CoinName": "ELA",
+                "Amount": "",
+                "ReceivingAddress": "",
+                "ReturnUrl": "",
+            },
             amount: "",
         },
         methods: {
-            redRecord() {
-                location.href = "./didTxList3.html";
+            doCopy(url) {
+                var v = this;
+                this.$copyText(url).then(function(e) {
+                    v.toast(v.curLangule['key3']);
+                }, function(e) {})
+            },
+            toast(str) {
+                var v = this;
+                v.toastText = str
+                v.toastShow = true
+                setTimeout(function() {
+                    v.toastShow = false;
+                }, 1500)
+            },
+            getUrl() {
+                //获取主机地址
+                var localhostPaht = window.location.protocol + "//" + window.location.host;
+                return localhostPaht;
+            },
+            goCharge() {
+                this.schemeConfig['ReceivingAddress'] = this.payAddress;
+                this.schemeConfig['Amount'] = this.payBanance;
+                var baseUrl = this.getUrl();
+                if (baseUrl === "file://") {
+                    baseUrl = 'http://dev1.elapps.net';
+                }
+                this.schemeConfig['ReturnUrl'] = baseUrl + '/voteIndex.html';
+                var url = "elaphant://elapay?";
+                _.forEach(this.schemeConfig, function(val, key, index) {
+                    if (key === 'ReturnUrl' || key === 'RequestInfo' || key === 'RequestedContent') {
+                        val = encodeURIComponent(val);
+                    }
+                    url += key + '=' + val + '&';
+                });
+
+                var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
+                location.href = turl;
+
+            },
+            docopy(payAddress) {
+                this.doCopy(payAddress);
             },
             getAjax(url) {
                 return new Promise((resovle, reject) => {
@@ -174,6 +273,8 @@
         },
         created: function() {
             this.getAjaxHeight();
+            this.payAddress = this.getUrlParam('payAddress') || "";
+            this.payBanance = this.getUrlParam('payBalance') || "";
             this.type = this.getUrlParam('type') || "";
             this.txId = this.getUrlParam('txId') || "";
             this.amount = this.getUrlParam('amount') || "";

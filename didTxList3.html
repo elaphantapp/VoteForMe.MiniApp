@@ -180,6 +180,7 @@
 
             <div class="bounce3"></div>
         </div>
+        <div v-if="didVoteObj.length===0&&!loading" style="text-align: center;margin-top:50px;">{{curLangule['key24']}}</div>
         <div class="container" v-if="showType===1">
             <div style="padding-top:15px" v-if="didVoteObj.length>0&&!loading">
                 <span>{{curLangule['key7']}}：{{didVoteCount }}&nbsp;</span>
@@ -269,6 +270,7 @@
                 key20: '老用户票数',
                 key21: '得票数',
                 key23: '最终得票',
+                key24: '暂无交易记录'
             },
             en: {
                 title: 'DID Voting',
@@ -290,6 +292,7 @@
                 key20: 'Old user votes',
                 key21: 'Votes',
                 key23: 'Final votes',
+                key24: 'No transaction at present'
             },
             curLangule: {},
             toastText: "",
@@ -723,8 +726,8 @@
                         let item = data[0];
                         let time = item['block_time'];
                         let dlen = res.length;
-                        let pkey = res[0]['property_key'] || "";
-                        //let pkey = JSON.stringify(res);
+                        //let pkey = res[0]['property_key'] || "";
+                        let pkey = JSON.stringify(res);
                         if (pkey.indexOf('/Apps/8816ed501878a9f4404f5926c4fb2df56239424e41da9c449b4db35e9a8b99d5f976a0537858d709511b5b41cf11c0e88be8778008eb5f918a6aa712ac20c421/MiniPrograms') > -1) {
                             this.$set(this.didObj, did, true);
                         } else {
@@ -845,10 +848,16 @@
             },
         },
         created: function() {
-            this.getAjax('https://redpacket.elastos.org/api/v1/packet/peek?packet_hash=3608154614618932&show_receivers=true').then(res => {
-                if (res.status === 200) {
-                    let arr = res['result']['packet_detail']["packet_rcver_details"];
+            let hash = this.getUrlParam("hashStr");
+            this.getAjax('https://api-voteforme.elaphant.net/api/1/didvoting/packet_info?topic_id=' + hash).then(res => {
+                if (res.state === 0) {
+                    let dataStr = res['data'];
+                    let dataObj = JSON.parse(dataStr);
+                    let arr = dataObj['result']['packet_detail']["packet_rcver_details"];
                     this.redpackObj = _.keyBy(arr, 'address');
+                    this.getVoteDid();
+                } else {
+                    this.redpackObj = {};
                     this.getVoteDid();
                 }
             });

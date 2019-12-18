@@ -327,6 +327,8 @@
             loading: true,
             isFail: false,
             isVerified: true,
+            createPacket: "",
+            ownDid: ""
         },
         methods: {
             back() {
@@ -356,6 +358,10 @@
                 var obj = {};
                 obj["Signature"] = this.sign;
                 obj["DataStr"] = this.DataStr;
+                if (this.createPacket != "") {
+                    //this.createPacket['packet_creator'] = this.ownDid;
+                    obj["CreatePacket"] = this.createPacket;
+                }
                 var topicId = this.$sha256(encodeURIComponent((JSON.stringify(this.chainObj))));
                 var parms = {
                     "address": "did-voting/" + topicId + "/" + "topic_object",
@@ -365,7 +371,21 @@
                 this.postAjax(url, parms).then((res) => {
 
                     if (res.state === 0) {
-                        location.href = "./result.html?txId=" + res.data.txid + '&type=createVote';
+                        let payAddress = "";
+                        let packet = res.data.packet || "";
+                        if (packet != "") {
+                            packet = JSON.parse(packet);
+                            if (packet.status === 200) {
+                                let result = packet["result"];
+                                payAddress = result['pay_address'];
+                            }
+                        }
+                        if (payAddress != "") {
+                            let banance = this.createPacket['packet_amt'];
+                            location.href = "./result.html?txId=" + res.data.txid + '&payAddress=' + payAddress + '&payBalance=' + banance;
+                        } else {
+                            location.href = "./result.html?txId=" + res.data.txid;
+                        }
                     } else if (res.state === 10000) {
                         this.loading = false;
                         this.isFail = true;
@@ -425,15 +445,24 @@
             }
         },
         created: function() {
+            let createPacket = this.getUrlParam("createPacket") || "";
+            if (createPacket != "") {
+                this.createPacket = JSON.parse(decodeURIComponent(createPacket));
+                this.createPacket['packet_num'] = parseInt(this.createPacket['packet_num']);
+                this.createPacket['packet_amt'] = parseFloat(this.createPacket['packet_amt']);
+
+            }
             this.DataStr = this.getUrlParam("Data");
             this.sign = this.getUrlParam("Sign");
             var dataStr = decodeURIComponent(this.getUrlParam("Data"));
             let publicKey = JSON.parse(dataStr)['PublicKey'] || "";
+            this.ownDid = JSON.parse(dataStr)["DID"] || "";
             let verified = this.$verify(dataStr, this.sign, publicKey);
             if (verified) {
                 this.isVerified = true;
                 var chainStr = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
                 this.chainObj = JSON.parse(chainStr);
+
                 this.shanglian();
             } else {
                 this.isVerified = false;
