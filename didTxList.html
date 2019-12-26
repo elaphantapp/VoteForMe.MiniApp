@@ -607,7 +607,7 @@
                 let selectObj = rtItem["Selections"];
                 let slen = selectObj.length;
                 let did = JSON.parse(dataStr)["DID"];
-                let url = 'https://idchain-test.elastos.org/api/v2/block/properteis/did?did=' + did;
+                let url = 'https://idchain.elastos.org/api/v1/block/properteis/did?did=' + did;
                 if (verified) {
                     if (this.didPubs[did] == undefined || this.didPubs[did] == "") {
                         this.getAjax(url).then((res) => {
