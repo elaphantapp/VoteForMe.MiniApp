@@ -719,7 +719,7 @@
             },
             getdidTime(did, height, selectObj, slen) {
                 let timeId = setTimeout(() => {
-                    this.getAjax('https://idchain.elastos.org/api/v1/block/properteis/did?did=' + did).then((res) => {
+                    this.getAjax('https://idchain-test.elastos.org/api/v2/properteis/did?did=' + did).then((res) => {
                         let data = _.sortBy(res, function(item) {
                             return item["block_time"];
                         });
