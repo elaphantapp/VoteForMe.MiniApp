@@ -475,7 +475,7 @@
             },
             clickItem(item) {
                 var did = item["did"];
-                window.open('https://idchain-test.elastos.org/did_detail/' + did);
+                window.open('https://explorer.elaphant.app/did_detail/' + did);
             },
             handleTime(item) {
                 var str = String(item["createTime"]);
@@ -505,7 +505,7 @@
                 }
                 var hash = this.getUrlParam("hashStr") || '0e7e986d4d3d5569214f00139870d04fd79e9c2226b27e8ab02beb83a70d78b0';
                 this.propertyKey = 'did-voting/' + hash + '/topic_object';
-                var url = 'https://idchain-test.elastos.org/api/v1/block/properteis/history?key=' + this.propertyKey + '&did=' + this.chainDid + '&start=0&pageSize=50';
+                var url = 'https://explorer.elaphant.app/api/v1/block/properteis/history?key=' + this.propertyKey + '&did=' + this.chainDid + '&start=0&pageSize=50';
                 this.getAjax(url).then((res) => {
                     var item = res[0];
                     var dataStr = decodeURIComponent(JSON.parse(item['property_value'])['DataStr']);
@@ -719,7 +719,7 @@
             },
             getdidTime(did, height, selectObj, slen) {
                 let timeId = setTimeout(() => {
-                    this.getAjax('https://idchain-test.elastos.org/api/v2/properteis/did?did=' + did).then((res) => {
+                    this.getAjax('https://explorer.elaphant.app/api/v2/properteis/did?did=' + did).then((res) => {
                         let data = _.sortBy(res, function(item) {
                             return item["block_time"];
                         });

@@ -13,7 +13,7 @@
     <!--ela js库-->
     <script src="./js/elastos-wallet-api-min.js"></script>
     <script>
-        Vue.prototype.$verify = this.verify;
+        //Vue.prototype.$verify = this.verify;
         Vue.prototype.$getAddress = this.getAddress;
     </script>
     <link rel="stylesheet" type="text/css" href="./css/reset.css">
@@ -291,7 +291,7 @@
             },
             clickItem(item) {
                 var did = item["did"];
-                window.open('https://idchain-test.elastos.org/did_detail/' + did);
+                window.open('https://explorer.elaphant.app/did_detail/' + did);
             },
             handleTime(item) {
                 var str = String(item["createTime"]);
@@ -321,7 +321,7 @@
                 }
                 var hash = this.getUrlParam("hashStr") || '0e9c43aa69926650fa5215e5b011a87bd31c248f011e03d20c80d5bea1e92cb1';
                 this.propertyKey = 'did-voting/' + hash + '/topic_object';
-                var url = 'https://idchain-test.elastos.org/api/v1/block/properteis/history?key=' + this.propertyKey + '&did=' + this.chainDid + '&start=0&pageSize=50';
+                var url = 'https://explorer.elaphant.app/api/v1/block/properteis/history?key=' + this.propertyKey + '&did=' + this.chainDid + '&start=0&pageSize=50';
                 this.getAjax(url).then((res) => {
                     var item = res[0];
                     var dataStr = decodeURIComponent(JSON.parse(item['property_value'])['DataStr']);
@@ -601,13 +601,14 @@
                 let sign = valueItem["Signature"];
                 let dataStr = decodeURIComponent(valueItem["DataStr"]);
                 let publicKey = JSON.parse(dataStr)['PublicKey'];
-                let verified = this.$verify(dataStr, sign, publicKey);
+                let verified = window.verify(dataStr, sign, publicKey);
+                console.log("=====verified====" + verified);
                 let dataStrItem = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
                 let rtItem = JSON.parse(dataStrItem);
                 let selectObj = rtItem["Selections"];
                 let slen = selectObj.length;
                 let did = JSON.parse(dataStr)["DID"];
-                let url = 'https://idchain-test.elastos.org/api/v2/properteis/did?did=' + did;
+                let url = 'https://explorer.elaphant.app/api/v2/properteis/did?did=' + did;
                 if (verified) {
                     if (this.didPubs[did] == undefined || this.didPubs[did] == "") {
                         this.getAjax(url).then((res) => {

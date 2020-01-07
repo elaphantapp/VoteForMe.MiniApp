@@ -686,7 +686,7 @@
             init() {
                 var hash = this.getUrlParam("hashStr");
                 this.propertyKey = 'did-voting/' + hash + '/topic_object';
-                var url = 'https://idchain-test.elastos.org/api/v1/block/properteis/history?key=' + this.propertyKey + '&did=' + this.chainDid + '&start=0&pageSize=50';
+                var url = 'https://explorer.elaphant.app/api/v1/block/properteis/history?key=' + this.propertyKey + '&did=' + this.chainDid + '&start=0&pageSize=50';
                 this.getAjax(url).then((res) => {
                     var item = res[0];
                     var dataStr = decodeURIComponent(JSON.parse(item['property_value'])['DataStr']);
