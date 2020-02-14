@@ -235,7 +235,7 @@
                 });
             },
             getAjaxHeight() {
-                this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
+                this.getAjax('https://explorer.elaphant.app/api/v1/block/height').then((res) => {
                     this.curblock = res[0].height;
                 }).catch(() => {
 

@@ -765,7 +765,7 @@
                         location.href = "./didVoteV2.html?hashStr=" + hash;
                     }
                 } else {
-                    window.open('https://idchain.elastos.org/txinfo/' + item['txHash']);
+                    window.open('https://explorer.elaphant.app/transaction_detail/' + item['txHash']);
                 }
 
             },
@@ -835,7 +835,7 @@
                 var arr = Object.keys(this.didList);
                 for (var index = 0; index < arr.length; index++) {
                     let txId = arr[index];
-                    let url = 'https://idchain.elastos.org/api/v1/block/transactions/txid?txid=' + txId;
+                    let url = 'https://explorer.elaphant.app/api/v1/block/transactions/txid?txid=' + txId;
                     this.getAjax(url).then((res) => {
                         if (res.length > 0) {
                             Vue.delete(this.didList, txId);
@@ -907,13 +907,13 @@
                 });
             },
             getAjaxHeight() {
-                this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
+                this.getAjax('https://explorer.elaphant.app/api/v1/block/height').then((res) => {
                     this.curblock = res[0].height;
                     this.curTime = parseInt(new Date().getTime() / 1000);
 
                     var self = this;
                     this.loading = true;
-                    var url = 'https://idchain.elastos.org/api/v1/block/properteis/did?did=' + this.chainDid;
+                    var url = 'https://explorer.elaphant.app/api/v1/block/properteis/did?did=' + this.chainDid;
                     if (this.tabIndex === 0) {
                         this.getAjax(url).then((res) => {
                             this.didVoteArr = this.handleDate(res);

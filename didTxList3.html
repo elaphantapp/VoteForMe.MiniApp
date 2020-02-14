@@ -512,12 +512,8 @@
                     var chainStr = JSON.parse(dataStr)["RequestedConent"] || JSON.parse(dataStr)["RequestedContent"];
                     this.chainObj = JSON.parse(chainStr);
 
-                    // this.getAjax('https://idchain.elastos.org/api/v1/block/height').then((res) => {
-                    //     this.curblock = res[0].height;
-                    //     this.curTime = parseInt(new Date().getTime() / 1000);
-                    // });
 
-                    var url = 'https://idchain.elastos.org/api/v1/block/properteis/did?did=' + this.chainDid;
+                    var url = 'https://explorer.elaphant.app/api/v1/block/properteis/did?did=' + this.chainDid;
                     this.getAjax(url).then((res) => {
                         let arr = this.selectData(res);
                         this.loading = false;
