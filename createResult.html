@@ -266,7 +266,7 @@
 
             <div class="bounce3"></div>
         </div>
-        <div style="margin-top: 30px;font-size: 16px;text-align: center">{{curLangule['key1']}}</div>
+        <div style="margin-top: 30px;font-size: 18px;text-align: center;color: red;" v-if="!isBalance || !isVerified || || isFail&&!loading">{{curLangule['key9']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isVerified">{{curLangule['key5']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isFail&&isVerified">{{curLangule['key2']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="isFail&&!loading">{{curLangule['key3']}}</div>
@@ -304,7 +304,8 @@
                 key5: '验签失败',
                 key6: '无效参数',
                 key7: '服务器异常，请稍后再试',
-                key8: '网络异常，请稍后再试'
+                key8: '网络异常，请稍后再试',
+                key9: '投票失败',
             },
             en: {
                 title: 'Voting',
@@ -316,7 +317,8 @@
                 key5: 'Verification failed',
                 key6: 'Invalid parameter',
                 key7: 'Server exception, please try again later.',
-                key8: 'Network exception, please try again later.'
+                key8: 'Network exception, please try again later.',
+                key9: 'Failed to vote',
             },
             curLangule: {},
             toastText: "",
