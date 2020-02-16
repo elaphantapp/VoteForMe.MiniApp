@@ -269,7 +269,7 @@
         <div style="margin-top: 30px;font-size: 18px;text-align: center;color: red;" v-if="!isBalance || !isVerified || || isFail&&!loading">{{curLangule['key10']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isVerified">{{curLangule['key5']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isBalance">{{curLangule['key6']}}</div>
-        <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isFail&&isVerified&&isBalance">{{curLangule['key2']}}</div>
+        <div style="margin-top: 30px;font-size: 16px;text-align: center" v-if="!isFail&&isVerified&&isBalance">{{curLangule['key2']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="isFail&&!loading">{{curLangule['key3']}}</div>
         <div class="four" v-if="isFail&&!loading">
             <span @click="back" class="left">
