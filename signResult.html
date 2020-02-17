@@ -266,7 +266,7 @@
 
             <div class="bounce3"></div>
         </div>
-        <div style="margin-top: 30px;font-size: 18px;text-align: center;color: red;" v-if="!isBalance || !isVerified || || isFail&&!loading">{{curLangule['key10']}}</div>
+        <div style="margin-top: 30px;font-size: 18px;text-align: center;color: red;" v-if="!isBalance || !isVerified || isFail&&!loading">{{curLangule['key10']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isVerified">{{curLangule['key5']}}</div>
         <div style="margin-top: 5px;font-size: 16px;text-align: center" v-if="!isBalance">{{curLangule['key6']}}</div>
         <div style="margin-top: 30px;font-size: 16px;text-align: center" v-if="!isFail&&isVerified&&isBalance">{{curLangule['key2']}}</div>
@@ -459,6 +459,7 @@
             },
         },
         created: function() {
+
             this.propertyKey = this.getUrlParam("propertyKey");
             this.DataStr = this.getUrlParam("Data");
             this.sign = this.getUrlParam("Sign");
