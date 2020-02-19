@@ -568,13 +568,36 @@
                 this.votes['Limit-balance'] = parseFloat(maxbalance);
                 var objStr = JSON.stringify(this.votes);
                 var url = this.buildSign(objStr);
-                var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
-                location.href = turl;
+                if (this.isPC() || this.isWechat()) {
+                    var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
+                    location.href = turl;
+                } else {
+                    location.href = url;
+                }
             },
             getBHeight(curTime) {
                 var cur = parseInt(this.curTime / 1000);
                 var height = this.curblock + (curTime - cur) / 180;
                 return parseInt(height);
+            },
+            isPC() {
+                var userAgentInfo = navigator.userAgent;
+                var Agents = ["Android", "iPhone",
+                    "SymbianOS", "Windows Phone",
+                    "iPad", "iPod"
+                ];
+                var flag = true;
+                for (var v = 0; v < Agents.length; v++) {
+                    if (userAgentInfo.indexOf(Agents[v]) > 0) {
+                        flag = false;
+                        break;
+                    }
+                }
+                return flag;
+            },
+            isWechat() {
+                var ua = navigator.userAgent.toLowerCase();
+                return /micromessenger/i.test(ua) || typeof navigator.wxuserAgent !== 'undefined';
             },
             buildSign(objStr) {
                 this.schemeConfig['RequestedContent'] = objStr;

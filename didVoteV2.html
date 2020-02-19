@@ -941,8 +941,31 @@
 
                 var objStr = JSON.stringify(this.voteObject);
                 var url = this.buildSign(objStr);
-                var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
-                location.href = turl;
+                if (this.isPC() || this.isWechat()) {
+                    var turl = 'https://launch.elaphant.app?appName=Vote For Me&autoRedirect=True&appTitle=Vote For Me&redirectURL=' + encodeURIComponent(url);
+                    location.href = turl;
+                } else {
+                    location.href = url;
+                }
+            },
+            isPC() {
+                var userAgentInfo = navigator.userAgent;
+                var Agents = ["Android", "iPhone",
+                    "SymbianOS", "Windows Phone",
+                    "iPad", "iPod"
+                ];
+                var flag = true;
+                for (var v = 0; v < Agents.length; v++) {
+                    if (userAgentInfo.indexOf(Agents[v]) > 0) {
+                        flag = false;
+                        break;
+                    }
+                }
+                return flag;
+            },
+            isWechat() {
+                var ua = navigator.userAgent.toLowerCase();
+                return /micromessenger/i.test(ua) || typeof navigator.wxuserAgent !== 'undefined';
             },
             getUrlParam: function(name) {
                 //正则表达式过滤
