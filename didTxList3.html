@@ -824,20 +824,6 @@
                     "createTime": createTime
                 });
 
-                // let timeId = setTimeout(() => {
-                //     this.getBalance(address).then((res) => {
-                //         if (res.status === 200) {
-                //             this.$set(this.bnaceObj, address, res.result);
-                //         } else {
-                //             this.$set(this.bnaceObj, address, 0);
-                //         }
-
-                //         clearTimeout(timeId);
-                //     });
-                // }, 1000);
-
-
-
                 this.didVoteObj = _.sortBy(this.didVoteObj, function(item) {
                     return item["createTime"];
                 });

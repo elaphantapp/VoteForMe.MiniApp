@@ -669,9 +669,84 @@
             didPubs: {},
             count: {
                 num: 0
-            }
+            },
+            options: {},
+            didObj: {},
         },
         methods: {
+            accDivCoupon(arg1, arg2) {
+                var t1 = 0,
+                    t2 = 0,
+                    r1, r2;
+                try {
+                    t1 = arg1.toString().split(".")[1].length;
+                } catch (e) {}
+                try {
+                    t2 = arg2.toString().split(".")[1].length;
+                } catch (e) {}
+                with(Math) {
+                    r1 = Number(arg1.toString().replace(".", ""));
+                    r2 = Number(arg2.toString().replace(".", ""));
+                    return (r1 / r2) * pow(10, t2 - t1);
+                }
+            },
+            accAdd(arg1, arg2) {
+                var r1, r2, m;
+                try {
+                    r1 = arg1.toString().split(".")[1].length
+                } catch (e) {
+                    r1 = 0
+                };
+                try {
+                    r2 = arg2.toString().split(".")[1].length
+                } catch (e) {
+                    r2 = 0
+                };
+                m = Math.pow(10, Math.max(r1, r2));
+                return (arg1 * m + arg2 * m) / m;
+            },
+            accMul(arg1, arg2) {
+                var m = 0,
+                    s1 = arg1.toString(),
+                    s2 = arg2.toString();
+                try {
+                    m += s1.split(".")[1].length
+                } catch (e) {};
+                try {
+                    m += s2.split(".")[1].length
+                } catch (e) {};
+                return Number(s1.replace(".", "")) * Number(s2.replace(".", "")) / Math.pow(10, m);
+            },
+            accSubtr(arg1, arg2) {
+                var r1, r2, m, n;
+                try {
+                    r1 = arg1.toString().split(".")[1].length;
+                } catch (e) {
+                    r1 = 0;
+                }
+                try {
+                    r2 = arg2.toString().split(".")[1].length;
+                } catch (e) {
+                    r2 = 0;
+                }
+                m = Math.pow(10, Math.max(r1, r2));
+                //动态控制精度长度
+                n = (r1 >= r2) ? r1 : r2;
+                return ((arg1 * m - arg2 * m) / m).toFixed(n);
+            },
+            handlex(q, h) {
+                console.log("==q===" + q);
+                let first = this.accDivCoupon(h, 0.8);
+                let second = this.accMul(first, 0.2);
+                if (q < second) {
+                    return this.accAdd(h, q);
+                } else {
+                    let t = this.accAdd(h, q);
+                    let c = this.accSubtr(q, second);
+                    return this.accSubtr(t, c);
+                }
+
+            },
             redRecord() {
                 location.href = "./didTxList3.html?hashStr=" + this.propertyKey.split('/')[1];
             },
@@ -869,16 +944,17 @@
                 location.href = "./didList.html";
             },
             handlNum(item) {
-                var topicId = this.propertyKey.split('/')[1];
-                var key = topicId + '-' + item["OptionID"];
-                var obj = this.didVoteObj[key] || "";
+                let sNo = item["OptionID"];
+                var obj = this.options[sNo] || "";
                 if (obj === "") {
-                    this.$set(this.didVoteObj, key, {
-                        "votes": 0,
-                        "didList": []
-                    });
+                    this.$set(this.options, sNo, {
+                        h: 0,
+                        no: sNo,
+                        q: 0,
+                        t: 0
+                    })
                 }
-                return this.didVoteObj[key]["votes"];
+                return this.options[sNo]['t'];
             },
             buildSign(objStr) {
                 this.schemeConfig['RequestedContent'] = objStr;
@@ -1066,6 +1142,78 @@
 
                 return arr;
             },
+            getdidTime(did, height, selectObj, slen) {
+                let timeId = setTimeout(() => {
+                    this.getAjax('https://explorer.elaphant.app/api/v2/properteis/did?did=' + did).then((res) => {
+                        let data = _.sortBy(res, function(item) {
+                            return item["block_time"];
+                        });
+                        let item = data[0];
+                        let time = item['block_time'];
+                        let dlen = res.length;
+                        //let pkey = res[0]['property_key'] || "";
+                        let pkey = JSON.stringify(res);
+                        if (pkey.indexOf('/Apps/8816ed501878a9f4404f5926c4fb2df56239424e41da9c449b4db35e9a8b99d5f976a0537858d709511b5b41cf11c0e88be8778008eb5f918a6aa712ac20c421/MiniPrograms') > -1) {
+                            this.$set(this.didObj, did, true);
+                        } else {
+                            this.$set(this.didObj, did, false);
+                        }
+                        let bheight = item['height'];
+                        let isRed = false;
+                        if (bheight < height) {
+                            isRed = false;
+                            if (this.didObj[did]) {
+                                //this.didVoteVCount = this.didVoteVCount + slen;
+                                for (let index1 = 0; index1 < slen; index1++) {
+                                    let sNo = selectObj[index1]["OptionID"];
+                                    let sNoVal = this.options[sNo] || '';
+                                    if (sNoVal === '') {
+                                        this.options[sNo] = {};
+                                        this.options[sNo]['h'] = 0;
+                                        this.options[sNo]['no'] = sNo;
+                                        this.options[sNo]['q'] = 0;
+                                        this.options[sNo]['t'] = 0;
+                                    }
+                                    this.options[sNo]['h'] = this.options[sNo]['h'] + 1;
+                                    this.options[sNo]['t'] = this.handlex(this.options[sNo]['q'], this.options[sNo]['h']);
+                                    // this.options1 = _.sortBy(this.options, function(item) {
+                                    //     return item["t"];
+                                    // });
+                                }
+
+                            }
+                        } else {
+                            isRed = true;
+                            if (this.didObj[did]) {
+                                this.didVoteVCount = this.didVoteVCount + slen;
+                                for (let index1 = 0; index1 < slen; index1++) {
+                                    let sNo = selectObj[index1]["OptionID"];
+                                    let sNoVal = this.options[sNo] || '';
+                                    if (sNoVal === '') {
+                                        this.options[sNo] = {};
+                                        this.options[sNo]['h'] = 0;
+                                        this.options[sNo]['no'] = sNo;
+                                        this.options[sNo]['q'] = 0;
+                                        this.options[sNo]['t'] = 0;
+                                    }
+                                    this.options[sNo]['q'] = this.options[sNo]['q'] + 1;
+                                    this.options[sNo]['t'] = this.handlex(this.options[sNo]['q'], this.options[sNo]['h']);
+                                }
+                            }
+                        }
+
+                        // this.options1 = _.sortBy(this.options, function(item) {
+                        //     return -item["t"];
+                        // });
+                        // let obj = {
+                        //     ctime: time,
+                        //     isRed: isRed
+                        // }
+                        // this.$set(this.didTimeObj, did, obj);
+                        clearTimeout(timeId);
+                    });
+                }, 10);
+            },
             handleDate(it) {
                 let item = it;
                 let topicId = this.propertyKey.split('/')[1];
@@ -1084,7 +1232,8 @@
                 let selectObj = rtItem["Selections"];
                 let slen = selectObj.length;
                 let did = JSON.parse(dataStr)["DID"];
-                for (let index1 = 0; index1 < selectObj.length; index1++) {
+                this.getdidTime(did, this.chainObj["Starting-height"], selectObj, slen);
+                for (let index1 = 0; index1 < slen; index1++) {
                     let key1 = topicId + "-" + selectObj[index1]["OptionID"];
                     if (this.didVoteObj[key1]) {
                         let didlist = this.didVoteObj[key1]["didList"] || [];
